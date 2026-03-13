@@ -112,7 +112,7 @@ def make_ortho_poster_instagram(org_name: str, city: str, offer_price: str, doct
             },
             {
                 "type": "original_price",
-                "value": "₹1,500",
+                "value": "₹1,000",
                 "x": 40, "y": 825, "w": 1000,
                 "font_size": 28, "color": "#9CA3AF", "strikethrough": True, "align": "center"
             },
@@ -427,7 +427,7 @@ async def seed():
 
         org_name = "Star Hospital"
         city = "Kothagudem"
-        doctor = "Dr. Sunil Verma (MS Ortho, AIIMS)"
+        doctor = "Dr. Shashi (MBBS, MS Ortho)"
 
         variants_to_create = [
             # Orthopedic Poster 1 — Instagram Square ₹500
@@ -443,7 +443,7 @@ async def seed():
                 social_caption=(
                     f"🦴 FREE Orthopaedic Health Camp at {org_name}, {city}!\n\n"
                     "Don't let pain slow you down. Get expert bone, joint & spine check-up.\n\n"
-                    f"✅ Only ₹500 Consultation | Original ₹1,500\n"
+                    f"✅ Only ₹500 Consultation | Original ₹1,000\n"
                     f"📅 15–30 March 2026 | 9 AM – 5 PM\n\n"
                     "#OrthopedicCamp #FreeHealthCheckup #StarHospital #Kothagudem #BoneHealth"
                 ),
@@ -471,7 +471,7 @@ async def seed():
                 social_caption=(
                     f"🏥 {org_name} presents FREE Orthopaedic Health Camp!\n\n"
                     "Get complete bone, joint & spine check-up by expert orthopaedic surgeons.\n"
-                    f"💰 Only ₹500 (Worth ₹1,500+) | 📅 March 15–30, 2026\n\n"
+                    f"💰 Only ₹500 (Worth ₹1,000+) | 📅 March 15–30, 2026\n\n"
                     "#StarHospital #OrthopaedicCamp #Kothagudem #BoneHealth #FreeCheckup"
                 ),
                 hashtags=["StarHospital", "Kothagudem", "OrthopaedicCamp", "BoneHealth"],
@@ -576,7 +576,7 @@ async def seed():
                     "🔴 Back Pain / Slip Disc\n"
                     "🔴 Sports Injury / Fracture\n\n"
                     "📢 *Special Offer:*\n"
-                    "💰 Only *₹500* (Original ₹1,500)\n"
+                    "💰 Only *₹500* (Original ₹1,000)\n"
                     "Includes X-Ray + Doctor Consultation\n\n"
                     "📅 15–30 March 2026 | 9 AM – 5 PM\n"
                     "📍 Star Hospital, Kothagudem\n\n"
@@ -616,7 +616,7 @@ async def seed():
                 content=(
                     "⭐⭐⭐⭐⭐ *Patient Success Story*\n\n"
                     "_\"I had severe knee pain for 3 years. After treatment at Star Hospital, "
-                    "I can walk 5 km daily without pain. Thank you Dr. Sunil Verma!\"_\n\n"
+                    "I can walk 5 km daily without pain. Thank you Dr. Shashi!\"_\n\n"
                     "— *Ramaiah G., 58, Kothagudem*\n\n"
                     "📞 Book your consultation: +91-98001-77001\n"
                     "🏥 Star Hospital, Kothagudem — Your Health, Our Priority"
