@@ -1431,3 +1431,59 @@ This project is licensed under the **MIT License** â€” see [LICENSE](LICENS
 *SRP Marketing OS â€” Version 1.0.0 Â· March 2026*
 
 </div>
+
+---
+
+## Recent Changes
+
+### v1.0.1 — commit `bd86111`
+**UI Error Handling + Bunty Demo Data**
+
+- **fix(CRM):** Removed hardcoded INR Rs symbol from New Deal modal → now "Deal Value"
+- **fix(Leads):** New Lead modal now scrollable (overflow-y-auto) on all screen sizes
+- **fix(ContentGenerator):** Error state added — no longer silently freezes on API failure
+- **fix(Campaigns):** AI Plan / Full Launch now show error banner when API fails; budget display improved
+- **feat(seed):** seed_star_posters.py — 4 poster variants (Orthopedic Rs500 x2, Diabetes, General Health) + 5 WhatsApp status posts for bunty
+- **docs:** Audit reports updated (bugs 5-8 documented and fixed)
+
+### v1.0.0 — commit `b4bdfff`
+**Core Audit Fixes + Premium Poster Templates**
+
+- Fixed main.py settings naming conflict (critical startup bug)
+- Fixed analytics active_campaigns counter (was ZERO, now correct)
+- Fixed poster download (raw JSON → rendered HTML + print-to-PDF window)
+- Fixed dashboard pipeline value double-division
+
+```bash
+# Seed bunty demo data (run after alembic migrations):
+python backend/seed_bunty.py         # leads, campaigns, conversations
+python backend/seed_star_posters.py  # poster gallery + WhatsApp posts
+```
+
+---
+
+## Recent Changes
+
+### v1.0.1 - commit bd86111
+UI Error Handling + Bunty Demo Data
+
+- fix(CRM): Removed hardcoded INR symbol - now shows 'Deal Value'
+- fix(Leads): New Lead modal now scrollable on all screen sizes
+- fix(ContentGenerator): Error state added - no longer silently freezes
+- fix(Campaigns): AI Plan / Launch now show error banner when API fails
+- feat(seed): seed_star_posters.py - 4 poster variants + 5 WhatsApp posts for bunty
+- docs: Audit reports updated with bugs 5-8
+
+### v1.0.0 - commit b4bdfff
+Core Audit Fixes + Premium Poster Templates
+
+- Fixed main.py settings naming conflict
+- Fixed analytics active_campaigns counter
+- Fixed poster download
+- Fixed dashboard pipeline value
+
+```bash
+# Seed bunty demo data:
+python backend/seed_bunty.py
+python backend/seed_star_posters.py
+```
