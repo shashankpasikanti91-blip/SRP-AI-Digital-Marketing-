@@ -1,0 +1,3 @@
+# SSL certificates go here — DO NOT COMMIT .pem/.crt/.key files
+# This directory is gitignored for security.
+# See DEPLOY_CHECKLIST_APP_SRP_AILABS.md for setup instructions.

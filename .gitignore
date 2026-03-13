@@ -54,8 +54,11 @@ desktop.ini
 *.swp
 *.swo
 
-# SSL certificates
-nginx/ssl/
+# SSL certificates (NEVER commit private keys or certs)
+nginx/ssl/*.pem
+nginx/ssl/*.crt
+nginx/ssl/*.key
+nginx/ssl/*.p12
 *.pem
 *.crt
 *.key
