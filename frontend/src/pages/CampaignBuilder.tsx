@@ -13,7 +13,12 @@ const TEMPLATE_CATEGORIES = [
   { id: 'education', label: '📚 Education', color: 'sky' },
   { id: 'beauty', label: '💄 Beauty & Wellness', color: 'pink' },
   { id: 'events', label: '🎉 Events & Services', color: 'purple' },
+  { id: 'malaysia', label: '🇲🇾 Malaysia', color: 'teal' },
 ];
+
+// ── Featured highlights for Malaysia territory ─────────────────────────────
+// These map to the same backend template_slug as the generic versions
+// but are surfaced prominently under the Malaysia filter for quick access
 
 const TEMPLATES = [
   // ── HEALTHCARE ────────────────────────────────────────────────────
@@ -274,6 +279,43 @@ const TEMPLATES = [
     category: 'events',
     description: 'Tour packages, pilgrimage & travel offers',
     color: 'sky',
+    fields: ['offer_price', 'original_price', 'services', 'date_range'],
+  },
+  // ── MALAYSIA 🇲🇾 — Hospital & Recruitment featured templates ────────────
+  {
+    slug: 'malaysia_hospital_premium',
+    label: '🇲🇾 Hospital Premium (MY)',
+    icon: '🏥',
+    category: 'malaysia',
+    description: 'Premium hospital campaign for Malaysia — Bahasa Melayu + English bilingual',
+    color: 'teal',
+    fields: ['doctor_name', 'doctor_qualification', 'department', 'date_range', 'event_time', 'offer_price', 'services', 'locality'],
+  },
+  {
+    slug: 'malaysia_job_opening',
+    label: '🇲🇾 Job Vacancy (MY)',
+    icon: '💼',
+    category: 'malaysia',
+    description: 'Malaysian job hiring poster — Bahasa Melayu + English bilingual',
+    color: 'indigo',
+    fields: ['job_title', 'vacancies', 'salary_range', 'experience', 'services'],
+  },
+  {
+    slug: 'malaysia_walkin_drive',
+    label: '🇲🇾 Walk-in Interview (MY)',
+    icon: '🚶',
+    category: 'malaysia',
+    description: 'Walk-in interview drive in Malaysia — bilingual BM/EN',
+    color: 'purple',
+    fields: ['job_title', 'vacancies', 'experience', 'date_range', 'event_time', 'locality'],
+  },
+  {
+    slug: 'malaysia_retail_sale',
+    label: '🇲🇾 Kedai / Retail Sale (MY)',
+    icon: '🛍️',
+    category: 'malaysia',
+    description: 'Malaysian retail sale poster — Bahasa Melayu bilingual',
+    color: 'orange',
     fields: ['offer_price', 'original_price', 'services', 'date_range'],
   },
 ];

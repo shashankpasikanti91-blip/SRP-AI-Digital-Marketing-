@@ -87,6 +87,13 @@ export function LeadsPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<LeadStatus | 'all'>('all')
   const [showCreate, setShowCreate] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  function toggleLead(id: string) {
+    setSelectedIds(prev => {
+      const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n;
+    });
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: ['leads', search, statusFilter],
@@ -108,7 +115,23 @@ export function LeadsPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['leads'] }),
   })
 
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      await Promise.all(ids.map(id => leadsApi.delete(id)));
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['leads'] });
+      setSelectedIds(new Set());
+    },
+  })
+
   const leads: Lead[] = data?.items ?? []
+  const allSelected = leads.length > 0 && leads.every(l => selectedIds.has(l.id))
+
+  function toggleAll() {
+    if (allSelected) setSelectedIds(new Set());
+    else setSelectedIds(new Set(leads.map(l => l.id)));
+  }
 
   return (
     <div className="space-y-6">
@@ -117,12 +140,26 @@ export function LeadsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
           <p className="text-gray-500 text-sm mt-1">{data?.total ?? 0} total leads</p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
-        >
-          <Plus className="w-4 h-4" /> New Lead
-        </button>
+        <div className="flex items-center gap-2">
+          {selectedIds.size > 0 && (
+            <button
+              onClick={() => {
+                if (window.confirm(`Delete ${selectedIds.size} lead${selectedIds.size !== 1 ? 's' : ''}? This cannot be undone.`))
+                  bulkDeleteMutation.mutate([...selectedIds]);
+              }}
+              disabled={bulkDeleteMutation.isPending}
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              <Trash2 className="w-4 h-4" /> Delete {selectedIds.size}
+            </button>
+          )}
+          <button
+            onClick={() => setShowCreate(true)}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+          >
+            <Plus className="w-4 h-4" /> New Lead
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -164,6 +201,10 @@ export function LeadsPage() {
           <table className="w-full">
             <thead>
               <tr className="text-xs font-medium text-gray-500 bg-gray-50 border-b border-gray-200">
+                <th className="px-4 py-3 w-8">
+                  <input type="checkbox" checked={allSelected} onChange={toggleAll}
+                    className="rounded border-gray-300 text-indigo-600 cursor-pointer" />
+                </th>
                 <th className="text-left px-4 py-3">Name</th>
                 <th className="text-left px-4 py-3">Contact</th>
                 <th className="text-left px-4 py-3">Source</th>
@@ -175,7 +216,11 @@ export function LeadsPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {leads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={lead.id} className={`transition-colors ${selectedIds.has(lead.id) ? 'bg-red-50' : 'hover:bg-gray-50'}`}>
+                  <td className="px-4 py-3">
+                    <input type="checkbox" checked={selectedIds.has(lead.id)} onChange={() => toggleLead(lead.id)}
+                      className="rounded border-gray-300 text-indigo-600 cursor-pointer" />
+                  </td>
                   <td className="px-4 py-3">
                     <p className="font-medium text-gray-900 text-sm">{lead.name}</p>
                     {lead.company && <p className="text-xs text-gray-400">{lead.company}</p>}

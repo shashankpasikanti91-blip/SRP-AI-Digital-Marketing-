@@ -755,6 +755,46 @@ ai-marketing-os/
 
 ## Release Notes
 
+### v1.2.0 — 14 March 2026
+
+**Bug Fixes**
+
+- **Poster: translation error text no longer shown** — `[Translation failed: Error code: 401 ...]` messages that were stored in old poster JSON are now silently filtered in `PosterRenderer`. Posters fall back to English text instead of showing raw API errors.
+- **Poster Gallery: delete now works from grid cards** — hover over any poster thumbnail to see a 🗑 quick-delete button without needing to open the detail view.
+- **Poster Gallery: bulk delete added** — new "✅ Select" mode toggles checkboxes on all cards. Select individual posters or "Select all N", then "Delete Selected" with confirmation dialog.
+- **Leads: bulk delete added** — header checkbox selects all filtered leads; row checkboxes allow individual selection; "Delete N" button in top toolbar with confirmation.
+- **Model router: FLUX model IDs corrected** — previously used `black-forest-labs/FLUX.1-schnell` (capital letters, wrong format); fixed to `black-forest-labs/flux-1-schnell` which matches the OpenRouter API exactly.
+- **Model router: GPT-4.1-mini added** — all text buckets updated from `gpt-4o-mini` to `gpt-4.1-mini` (better quality, 32K context, $0.40/1M input).
+- **Model router: image_generation fixed** — was incorrectly mapped to `gpt-4o` (a text model); now correctly uses FLUX.1-schnell ($0.003/img) with FLUX.1.1-pro ($0.04/img) as quality fallback.
+- **Google Fonts fixed** — `index.html` now preloads Inter + Noto Sans family (Telugu, Devanagari, Tamil, Kannada, Malayalam, Arabic); regional script poster text no longer renders as boxes.
+- **CTA button rendering fixed** — `PosterRenderer` now respects `w`, `h`, and `border_radius` from poster JSON; CTA is full-width with coloured glow shadow.
+- **celery-beat scheduler fixed** — was crashing with `django_celery_beat.schedulers:DatabaseScheduler` (package not installed); changed to `celery.beat.PersistentScheduler`.
+- **HTTP-Referer header fixed** — model router was sending `app.srpmarketingos.com`; updated to `app.srpailabs.com`.
+
+**New Templates**
+
+- **🇲🇾 Malaysia category** added to Campaign Builder with 4 featured templates:
+  - `malaysia_hospital_premium` — premium hospital health camp (BM/EN bilingual)
+  - `malaysia_job_opening` — job vacancy poster (Jawatan Kosong, BM/EN)
+  - `malaysia_walkin_drive` — walk-in interview (Temuduga Terbuka, BM/EN)
+  - `malaysia_retail_sale` — retail sale (Jualan Mega, BM/EN)
+- All Malaysia slugs map to `hospital_premium` / `job_opening` / `walkin_drive` visual templates with Malaysia-tuned AI prompts in `LanguageService.TEMPLATE_PROMPTS`.
+
+**Image Generation Tiers**
+
+| Model | Cost | Use case |
+|---|---|---|
+| `flux-1-schnell` | ~$0.003/img | Default — fast draft & testing |
+| `flux-1.1-pro` | ~$0.040/img | Quality fallback |
+| `flux-1-pro` | ~$0.055/img | In catalogue, available if configured |
+
+**Language Toggle (previous release)**
+
+- `getPosterForView()` in `VariantPreview` now actually swaps `_english` layers with `_regional` equivalents when user selects a regional language.
+- Status badges: "✓ Showing telugu" / "⚠ Regional translation unavailable" shown on poster preview.
+
+---
+
 ### v1.0.0 — March 2026
 
 **Core Platform**

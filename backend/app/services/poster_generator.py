@@ -522,6 +522,11 @@ SLUG_LAYOUT_MAP: dict[str, str] = {
     "it_services":         "business_services_pro",
     "consulting":          "business_services_pro",
     "law_firm":            "business_services_pro",
+    # ── Malaysia territory aliases — reuse premium templates ──
+    "malaysia_hospital_premium": "hospital_premium",
+    "malaysia_job_opening":      "job_opening",
+    "malaysia_walkin_drive":     "walkin_drive",
+    "malaysia_retail_sale":      "retail_discount",
 }
 
 

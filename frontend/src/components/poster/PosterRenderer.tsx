@@ -154,7 +154,10 @@ function renderRect(layer: PosterLayer, idx: number) {
 }
 
 function renderBadge(layer: PosterLayer, idx: number) {
-  if (!layer.text || layer.text.trim() === '') return null;
+  const badgeText = sanitizePosterText(layer.text || '');
+  if (!badgeText || badgeText.trim() === '') return null;
+  // shadow original text with sanitised value
+  layer = { ...layer, text: badgeText };
   return (
     <div
       key={idx}
@@ -198,9 +201,28 @@ function renderImage(layer: PosterLayer, idx: number) {
   );
 }
 
+/**
+ * Sanitise poster text — strip any translation error messages that may have been
+ * saved into the poster JSON before the graceful-fallback fix was applied.
+ * These look like: "[Translation failed: Error code: 401 - {'error': ...]"
+ */
+function sanitizePosterText(text: string): string {
+  if (!text) return '';
+  // Remove text that is a raw error message (starts with [ and contains 'failed' or 'Error')
+  if (text.startsWith('[Translation') || text.startsWith('[Error') ||
+      text.includes('Error code:') || text.includes('Translation failed') ||
+      /^\[.*error.*\]/i.test(text)) {
+    return '';
+  }
+  return text;
+}
+
 function renderText(layer: PosterLayer, idx: number) {
   // Skip empty text layers — prevents blank boxes when translation is unavailable
-  if (!layer.text || layer.text.trim() === '') return null;
+  const rawText = sanitizePosterText(layer.text || '');
+  if (!rawText || rawText.trim() === '') return null;
+  // Use cleaned text for rendering
+  const displayText = rawText;
 
   const isTitle = layer.role?.includes('title');
   const isSubtitle = layer.role?.includes('subtitle');
@@ -230,7 +252,7 @@ function renderText(layer: PosterLayer, idx: number) {
 
   return (
     <div key={idx} style={defaultStyle}>
-      {layer.text}
+      {displayText}
     </div>
   );
 }

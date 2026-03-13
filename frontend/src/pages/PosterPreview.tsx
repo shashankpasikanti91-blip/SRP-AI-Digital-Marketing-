@@ -38,7 +38,38 @@ export default function PosterPreview() {
   const [page, setPage] = useState(0);
   const [platformFilter, setPlatformFilter] = useState('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  // Bulk select
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const PAGE_SIZE = 20;
+
+  function toggleSelect(id: string) {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function selectAll() {
+    setSelectedIds(new Set(filtered.map(v => v.id)));
+  }
+
+  function clearSelection() {
+    setSelectedIds(new Set());
+    setSelectMode(false);
+  }
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      await Promise.all(ids.map(id => api.delete(`/posters/variants/${id}`)));
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['poster-variants'] });
+      setSelectedIds(new Set());
+      setSelectMode(false);
+    },
+  });
 
   const { data: variants = [], isLoading, isError } = useQuery<PosterVariant[]>({
     queryKey: ['poster-variants', page],
@@ -129,26 +160,58 @@ export default function PosterPreview() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
 
-        {/* Platform filter tabs */}
+        {/* Platform filter tabs + bulk action toolbar */}
         {!selectedId && !isLoading && variants.length > 0 && (
-          <div className="flex gap-2 flex-wrap mb-6">
-            {PLATFORMS.map(p => {
-              const meta = PLATFORM_META[p];
-              const active = platformFilter === p;
-              return (
-                <button
-                  key={p}
-                  onClick={() => setPlatformFilter(p)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                    active
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
-                  }`}
-                >
-                  {meta ? `${meta.icon} ${meta.label}` : '🌐 All'}
-                </button>
-              );
-            })}
+          <div className="flex gap-2 flex-wrap mb-4 items-center justify-between">
+            <div className="flex gap-2 flex-wrap">
+              {PLATFORMS.map(p => {
+                const meta = PLATFORM_META[p];
+                const active = platformFilter === p;
+                return (
+                  <button
+                    key={p}
+                    onClick={() => setPlatformFilter(p)}
+                    className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                      active
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                    }`}
+                  >
+                    {meta ? `${meta.icon} ${meta.label}` : '🌐 All'}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => { setSelectMode(s => !s); setSelectedIds(new Set()); }}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                selectMode ? 'bg-red-50 text-red-600 border-red-300' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+              }`}
+            >
+              {selectMode ? '✕ Cancel Select' : '☑ Select'}
+            </button>
+          </div>
+        )}
+
+        {/* Bulk delete toolbar (shown when items selected) */}
+        {selectedIds.size > 0 && !selectedId && (
+          <div className="flex items-center gap-3 mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl">
+            <span className="text-sm font-semibold text-red-700">{selectedIds.size} poster{selectedIds.size !== 1 ? 's' : ''} selected</span>
+            <button onClick={selectAll} className="text-xs text-indigo-600 hover:underline">Select all {filtered.length}</button>
+            <button onClick={clearSelection} className="text-xs text-gray-500 hover:underline">Clear</button>
+            <div className="ml-auto">
+              <button
+                disabled={bulkDeleteMutation.isPending}
+                onClick={() => {
+                  if (window.confirm(`Delete ${selectedIds.size} poster${selectedIds.size !== 1 ? 's' : ''}? This cannot be undone.`)) {
+                    bulkDeleteMutation.mutate([...selectedIds]);
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-lg text-sm font-semibold transition-all"
+              >
+                {bulkDeleteMutation.isPending ? 'Deleting…' : `🗑 Delete ${selectedIds.size} Selected`}
+              </button>
+            </div>
           </div>
         )}
 
@@ -221,11 +284,16 @@ export default function PosterPreview() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {group.map(variant => {
                       const pmeta = PLATFORM_META[variant.platform] || { icon: '🖼', label: variant.platform, color: 'text-gray-600', bg: 'bg-gray-50 border-gray-200' };
+                      const isSelected = selectedIds.has(variant.id);
                       return (
                         <div
                           key={variant.id}
-                          onClick={() => setSelectedId(variant.id)}
-                          className="cursor-pointer group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-blue-300 transition-all duration-200"
+                          onClick={() => selectMode ? toggleSelect(variant.id) : setSelectedId(variant.id)}
+                          className={`cursor-pointer group bg-white rounded-2xl shadow-sm overflow-hidden transition-all duration-200 ${
+                            isSelected
+                              ? 'border-2 border-red-400 shadow-red-100 shadow-md'
+                              : 'border border-gray-100 hover:shadow-xl hover:-translate-y-1 hover:border-blue-300'
+                          }`}
                         >
                           {/* Poster thumbnail */}
                           <div className="relative overflow-hidden bg-gray-50 flex items-center justify-center" style={{ minHeight: 180 }}>
@@ -234,12 +302,35 @@ export default function PosterPreview() {
                             <div className={`absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${pmeta.bg} ${pmeta.color}`}>
                               {pmeta.icon} {pmeta.label}
                             </div>
-                            {/* Hover overlay */}
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                              <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full shadow">
-                                View →
-                              </span>
-                            </div>
+                            {/* Select mode checkbox */}
+                            {selectMode && (
+                              <div className={`absolute top-2 right-2 w-5 h-5 rounded border-2 flex items-center justify-center text-xs font-bold transition-all ${
+                                isSelected ? 'bg-red-500 border-red-500 text-white' : 'bg-white border-gray-300'
+                              }`}>
+                                {isSelected && '✓'}
+                              </div>
+                            )}
+                            {/* Hover delete (non-select mode) */}
+                            {!selectMode && (
+                              <button
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  if (window.confirm('Delete this poster?')) deleteMutation.mutate(variant.id);
+                                }}
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow text-xs"
+                                title="Delete poster"
+                              >
+                                🗑
+                              </button>
+                            )}
+                            {/* Hover overlay (non-select mode) */}
+                            {!selectMode && (
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full shadow">
+                                  View →
+                                </span>
+                              </div>
+                            )}
                           </div>
 
                           {/* Card footer */}

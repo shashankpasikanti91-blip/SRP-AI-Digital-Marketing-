@@ -391,6 +391,29 @@ class LanguageService:
             "badge": "BOOK NOW",
             "services_default": ["Pilgrimage Tours", "Hill Station Packages", "Family Tours", "Bus/Train/Air Booking"],
         },
+        # ── Malaysia 🇲🇾 territory templates ──────────────────────────────────
+        # These use the same visual layout as their generic equivalents
+        # but the AI prompt is tuned for Malaysia (Bahasa Melayu context)
+        "malaysia_hospital_premium": {
+            "title_hint": "Create a compelling hospital health camp title suited for Malaysia — use local context (Bahasa Melayu/English bilingual)",
+            "badge": "PEMERIKSAAN PERCUMA",  # Free Checkup in BM
+            "services_default": ["Perundingan Doktor", "Ujian Darah", "Pemeriksaan BP", "ECG", "Khidmat Pakar"],
+        },
+        "malaysia_job_opening": {
+            "title_hint": "Create an impactful Malaysian job vacancy announcement — bilingual Bahasa Melayu / English",
+            "badge": "JAWATAN KOSONG",  # Job Vacancy in BM
+            "services_default": [],
+        },
+        "malaysia_walkin_drive": {
+            "title_hint": "Create an urgent Malaysian walk-in interview announcement — Bahasa Melayu + English",
+            "badge": "TEMUDUGA TERBUKA",  # Open Interview in BM
+            "services_default": [],
+        },
+        "malaysia_retail_sale": {
+            "title_hint": "Create a Malaysian retail sale campaign — bilingual Bahasa Melayu / English",
+            "badge": "JUALAN MEGA",  # Mega Sale in BM
+            "services_default": [],
+        },
     }
 
     @staticmethod
