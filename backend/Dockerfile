@@ -30,7 +30,7 @@ WORKDIR /app
 # Copy and install Python dependencies first (better layer caching)
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install --prefer-binary -r requirements.txt
 
 # Copy application code
 COPY . .

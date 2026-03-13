@@ -15,8 +15,9 @@ pydantic-settings==2.7.0
 pydantic[email]==2.10.4
 
 # ── AI — Pydantic AI ─────────────────────────────────────────────────
-pydantic-ai>=0.0.14
-openai>=1.50.0
+# Pinned to avoid pip resolver backtracking through openai v2.x series
+pydantic-ai==0.0.14
+openai>=1.50.0,<2.0.0
 # anthropic>=0.40.0   # uncomment if needed
 httpx>=0.27.0
 
