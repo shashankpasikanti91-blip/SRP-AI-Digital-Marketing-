@@ -154,6 +154,7 @@ function renderRect(layer: PosterLayer, idx: number) {
 }
 
 function renderBadge(layer: PosterLayer, idx: number) {
+  if (!layer.text || layer.text.trim() === '') return null;
   return (
     <div
       key={idx}
@@ -198,6 +199,9 @@ function renderImage(layer: PosterLayer, idx: number) {
 }
 
 function renderText(layer: PosterLayer, idx: number) {
+  // Skip empty text layers — prevents blank boxes when translation is unavailable
+  if (!layer.text || layer.text.trim() === '') return null;
+
   const isTitle = layer.role?.includes('title');
   const isSubtitle = layer.role?.includes('subtitle');
   const isDoctor = layer.role?.includes('doctor');
@@ -254,6 +258,7 @@ function renderChecklist(layer: PosterLayer, idx: number) {
 }
 
 function renderCtaButton(layer: PosterLayer, idx: number) {
+  if (!layer.text || layer.text.trim() === '') return null;
   return (
     <div key={idx} className="relative flex justify-center mt-1" style={{ zIndex: 2 }}>
       <div

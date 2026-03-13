@@ -180,33 +180,35 @@ MODELS: dict[str, ModelDef] = {
 # Primary = cheapest suitable model
 # Fallback = better model if primary fails
 BUCKET_MODEL_MAP: dict[FeatureBucket, tuple[str, str]] = {
+    # Primary = cheapest/best OpenRouter model
+    # Fallback = OpenAI direct (ensures translation works even if OpenRouter key fails)
     FeatureBucket.text_basic: (
         "openrouter/google/gemini-flash-1.5",
-        "openai/gpt-4o-mini",
+        "openai/gpt-4o-mini",           # Direct OpenAI fallback
     ),
     FeatureBucket.text_marketing: (
         "openrouter/openai/gpt-4o-mini",
-        "openai/gpt-4o-mini",
+        "openai/gpt-4o-mini",           # Direct OpenAI fallback
     ),
     FeatureBucket.translation: (
-        "openrouter/google/gemini-flash-1.5",
-        "openrouter/openai/gpt-4o-mini",
+        "openai/gpt-4o-mini",           # OpenAI direct as PRIMARY (most reliable for multilingual)
+        "openrouter/google/gemini-flash-1.5",  # OpenRouter as secondary
     ),
     FeatureBucket.localization: (
+        "openai/gpt-4o-mini",           # OpenAI direct as PRIMARY for locale accuracy
         "openrouter/openai/gpt-4o-mini",
-        "openai/gpt-4o-mini",
     ),
     FeatureBucket.seo_keywords: (
-        "openrouter/mistral/mistral-small",
-        "openrouter/openai/gpt-4o-mini",
+        "openrouter/google/gemini-flash-1.5",
+        "openai/gpt-4o-mini",           # Direct OpenAI fallback
     ),
     FeatureBucket.campaign_strategy: (
         "openrouter/openai/gpt-4o",
-        "openai/gpt-4o",
+        "openai/gpt-4o",                # Direct OpenAI fallback
     ),
     FeatureBucket.image_prompting: (
         "openrouter/openai/gpt-4o-mini",
-        "openai/gpt-4o-mini",
+        "openai/gpt-4o-mini",           # Direct OpenAI fallback
     ),
     FeatureBucket.image_generation: (
         # Image generation is always premium/explicit — no cheap fallback
@@ -215,15 +217,15 @@ BUCKET_MODEL_MAP: dict[FeatureBucket, tuple[str, str]] = {
     ),
     FeatureBucket.lead_classification: (
         "openrouter/openai/gpt-4o-mini",
-        "openai/gpt-4o-mini",
+        "openai/gpt-4o-mini",           # Direct OpenAI fallback
     ),
     FeatureBucket.email_copywriting: (
         "openrouter/openai/gpt-4o-mini",
-        "openai/gpt-4o-mini",
+        "openai/gpt-4o-mini",           # Direct OpenAI fallback
     ),
     FeatureBucket.chatbot: (
         "openrouter/anthropic/claude-3-haiku",
-        "openrouter/openai/gpt-4o-mini",
+        "openai/gpt-4o-mini",           # Direct OpenAI fallback
     ),
 }
 

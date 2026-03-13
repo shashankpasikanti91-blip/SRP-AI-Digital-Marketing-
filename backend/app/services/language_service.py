@@ -1,12 +1,23 @@
 """
-Language Service — bilingual campaign content generation for Indian regional languages.
+Language Service — bilingual / trilingual campaign content generation.
 
-Supported language pairs:
-  english + telugu   (Andhra Pradesh / Telangana)
+Supported language pairs (India):
+  english + telugu    (Andhra Pradesh / Telangana)
   english + hindi     (North India / national)
   english + tamil     (Tamil Nadu)
   english + kannada   (Karnataka)
   english + malayalam (Kerala)
+  english + bengali   (West Bengal)
+  english + marathi   (Maharashtra)
+  english + gujarati  (Gujarat)
+  english + punjabi   (Punjab)
+  english + odia      (Odisha)
+
+Supported language pairs (SE Asia / Oceania):
+  english + malay          (Malaysia / Brunei)
+  english + chinese_simplified  (Malaysia / Singapore)
+  english + indonesian     (Indonesia)
+  english + thai           (Thailand)
 
 AI is used ONLY for:
   - headline generation
@@ -15,27 +26,50 @@ AI is used ONLY for:
   - campaign summary
 
 NOT used for visual layout — that comes from PosterTemplate.
+
+IMPORTANT: Any translation failure is handled gracefully.
+  - Primary provider: OpenAI (gpt-4o-mini) — most reliable for multilingual
+  - Fallback provider: OpenRouter
+  - On failure: clean English-only output (no error text in poster fields)
 """
 
 import json
+import logging
 from typing import Literal
 
 from pydantic import BaseModel
 
 from app.config import settings
 
+logger = logging.getLogger(__name__)
+
 # ── Supported Language Codes ───────────────────────────────────────────
 
 SUPPORTED_LANGUAGES = {
-    "english": {"name": "English", "code": "en", "script": "Latin"},
-    "telugu": {"name": "Telugu", "code": "te", "script": "Telugu", "region": "Telangana/AP"},
-    "hindi": {"name": "Hindi", "code": "hi", "script": "Devanagari", "region": "North India"},
-    "tamil": {"name": "Tamil", "code": "ta", "script": "Tamil", "region": "Tamil Nadu"},
-    "kannada": {"name": "Kannada", "code": "kn", "script": "Kannada", "region": "Karnataka"},
-    "malayalam": {"name": "Malayalam", "code": "ml", "script": "Malayalam", "region": "Kerala"},
+    # ── Indian Languages ─────────────────────────────────────────────
+    "english":    {"name": "English",       "code": "en", "script": "Latin"},
+    "telugu":     {"name": "Telugu",        "code": "te", "script": "Telugu",      "region": "Telangana/AP"},
+    "hindi":      {"name": "Hindi",         "code": "hi", "script": "Devanagari",  "region": "North India"},
+    "tamil":      {"name": "Tamil",         "code": "ta", "script": "Tamil",       "region": "Tamil Nadu"},
+    "kannada":    {"name": "Kannada",       "code": "kn", "script": "Kannada",     "region": "Karnataka"},
+    "malayalam":  {"name": "Malayalam",     "code": "ml", "script": "Malayalam",   "region": "Kerala"},
+    "bengali":    {"name": "Bengali",       "code": "bn", "script": "Bengali",     "region": "West Bengal"},
+    "marathi":    {"name": "Marathi",       "code": "mr", "script": "Devanagari",  "region": "Maharashtra"},
+    "gujarati":   {"name": "Gujarati",      "code": "gu", "script": "Gujarati",    "region": "Gujarat"},
+    "punjabi":    {"name": "Punjabi",       "code": "pa", "script": "Gurmukhi",    "region": "Punjab"},
+    "odia":       {"name": "Odia",          "code": "or", "script": "Odia",        "region": "Odisha"},
+    # ── South-East Asia / Oceania ─────────────────────────────────────
+    "malay":              {"name": "Bahasa Melayu",      "code": "ms", "script": "Latin",    "region": "Malaysia/Brunei"},
+    "indonesian":         {"name": "Bahasa Indonesia",   "code": "id", "script": "Latin",    "region": "Indonesia"},
+    "thai":               {"name": "Thai",               "code": "th", "script": "Thai",     "region": "Thailand"},
+    "chinese_simplified": {"name": "Chinese (Simplified)", "code": "zh", "script": "Han",   "region": "Malaysia/Singapore/China"},
 }
 
-RegionalLanguage = Literal["telugu", "hindi", "tamil", "kannada", "malayalam"]
+RegionalLanguage = Literal[
+    "telugu", "hindi", "tamil", "kannada", "malayalam",
+    "bengali", "marathi", "gujarati", "punjabi", "odia",
+    "malay", "indonesian", "thai", "chinese_simplified",
+]
 
 
 # ── Bilingual Content Models ───────────────────────────────────────────
@@ -135,6 +169,7 @@ class LanguageService:
     # ── Translation context by language ───────────────────────────────
 
     TRANSLATION_GUIDANCE = {
+        # ── Indian Languages ────────────────────────────────────────────
         "telugu": (
             "Translate to natural, spoken Telugu used in Telangana/Andhra Pradesh. "
             "Use Telugu script (not transliteration). Keep medical/technical terms readable "
@@ -149,6 +184,62 @@ class LanguageService:
         "tamil": (
             "Translate to modern Tamil used in Tamil Nadu (Tamil script). "
             "Keep medical and technical terms in English where commonly understood. "
+            "Example: 'Free Health Camp' → 'இலவச உடல்நல முகாம்'"
+        ),
+        "kannada": (
+            "Translate to natural Kannada used in Karnataka (Kannada script). "
+            "Example: 'Free Health Camp' → 'ಉಚಿತ ಆರೋಗ್ಯ ಶಿಬಿರ'"
+        ),
+        "malayalam": (
+            "Translate to natural Malayalam (Malayalam script). "
+            "Example: 'Free Health Camp' → 'സൗജന്യ ആരോഗ്യ ക്യാമ്പ്'"
+        ),
+        "bengali": (
+            "Translate to standard Bengali/Bangla (Bengali script) used in West Bengal. "
+            "Keep brand and technical terms intact. "
+            "Example: 'Free Health Camp' → 'বিনামূল্যে স্বাস্থ্য শিবির'"
+        ),
+        "marathi": (
+            "Translate to natural Marathi (Devanagari script) used in Maharashtra. "
+            "Prefer common spoken Marathi over formal. "
+            "Example: 'Free Health Camp' → 'मोफत आरोग्य शिबिर'"
+        ),
+        "gujarati": (
+            "Translate to natural Gujarati (Gujarati script) used in Gujarat. "
+            "Example: 'Free Health Camp' → 'મફત આરોગ્ય કેમ્પ'"
+        ),
+        "punjabi": (
+            "Translate to Punjabi in Gurmukhi script used in Punjab, India. "
+            "Example: 'Free Health Camp' → 'ਮੁਫਤ ਸਿਹਤ ਕੈਂਪ'"
+        ),
+        "odia": (
+            "Translate to natural Odia (Odia script) used in Odisha. "
+            "Example: 'Free Health Camp' → 'ମୁଫ୍ତ ସ୍ୱାସ୍ଥ୍ୟ ଶିବିର'"
+        ),
+        # ── South-East Asia / Oceania ───────────────────────────────────
+        "malay": (
+            "Translate to standard Bahasa Melayu used in Malaysia. "
+            "Use formal but accessible Malay. Keep English brand names, medical terms, and short "
+            "technical words intact. Use Latin script. "
+            "Example: 'Free Health Camp' → 'Kamp Kesihatan Percuma'"
+        ),
+        "indonesian": (
+            "Translate to standard Bahasa Indonesia as used in Indonesia. "
+            "Keep it clear, modern, and accessible. Latin script. "
+            "Keep English brand names and technical terms when widely used. "
+            "Example: 'Free Health Camp' → 'Kamp Kesehatan Gratis'"
+        ),
+        "thai": (
+            "Translate to standard Thai (Thai script) suitable for professional marketing. "
+            "Be polite and respectful. Keep English product/brand names as-is. "
+            "Example: 'Free Health Camp' → 'ค่ายสุขภาพฟรี'"
+        ),
+        "chinese_simplified": (
+            "Translate to Simplified Chinese (简体中文) appropriate for Malaysia/Singapore audience. "
+            "Use clear, concise business/marketing language. Keep medical terms readable. "
+            "Example: 'Free Health Camp' → '免费健康营'"
+        ),
+    }            "Keep medical and technical terms in English where commonly understood. "
             "Example: 'Free Health Camp' → 'இலவச உடல்நல முகாம்'"
         ),
         "kannada": (
@@ -315,28 +406,54 @@ class LanguageService:
 
     @staticmethod
     async def _call_ai(system: str, prompt: str, output_model: type[BaseModel]):
-        """Call AI via ModelRouter (uses OpenRouter by default) and parse structured JSON output."""
+        """
+        Call AI via ModelRouter with automatic fallback.
+
+        Strategy:
+          1. Try primary model (OpenAI gpt-4o-mini — most reliable for multilingual)
+          2. If primary fails, try fallback model (OpenRouter)
+          3. If both fail, raise the last exception
+
+        This ensures translation works even when one provider is down or returns 401.
+        """
         from app.services.model_router import get_model_router, FeatureBucket
         router = get_model_router()
-        client, model = router.resolve(FeatureBucket.translation)
         schema = output_model.model_json_schema()
-        response = await client.chat.completions.create(
-            model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": system + "\n\nReturn ONLY valid JSON matching this schema:\n" + json.dumps(schema),
-                },
-                {"role": "user", "content": prompt},
-            ],
-            response_format={"type": "json_object"},
-            max_tokens=2000,
-            temperature=0.6,
-        )
-        raw = response.choices[0].message.content or "{}"
-        if raw.startswith("```"):
-            raw = raw.split("```")[-2].lstrip("json").strip()
-        return output_model.model_validate(json.loads(raw))
+
+        last_exc: Exception | None = None
+        for use_fallback in (False, True):
+            try:
+                client, model = router.resolve(FeatureBucket.translation, use_fallback=use_fallback)
+                response = await client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": system + "\n\nReturn ONLY valid JSON matching this schema:\n" + json.dumps(schema),
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    response_format={"type": "json_object"},
+                    max_tokens=2000,
+                    temperature=0.6,
+                )
+                raw = response.choices[0].message.content or "{}"
+                if raw.startswith("```"):
+                    raw = raw.split("```")[-2].lstrip("json").strip()
+                return output_model.model_validate(json.loads(raw))
+            except Exception as e:
+                last_exc = e
+                if not use_fallback:
+                    logger.warning(
+                        f"[LanguageService] Primary AI provider failed: {type(e).__name__}: {str(e)[:120]}. "
+                        "Retrying with fallback provider..."
+                    )
+                else:
+                    logger.error(
+                        f"[LanguageService] Fallback AI provider also failed: {type(e).__name__}: {str(e)[:120]}"
+                    )
+
+        raise last_exc  # type: ignore[misc]
 
     @staticmethod
     async def generate_bilingual_content(
@@ -403,23 +520,30 @@ class LanguageService:
             hashtags: list[str]
             summary: str
 
-        system_prompt = f"""You are a bilingual marketing content specialist for Indian regional markets.
+        lang_info = SUPPORTED_LANGUAGES.get(regional_lang, {"name": regional_lang.title(), "script": "unknown"})
+        lang_display = lang_info["name"]
+        lang_script = lang_info["script"]
+
+        system_prompt = f"""You are a professional multilingual marketing content specialist.
+You create compelling campaign poster content for local businesses across India, SE Asia, and Oceania.
 
 Your task:
-1. Generate compelling English poster text for the campaign context
-2. Translate ALL text fields into {regional_lang} ({SUPPORTED_LANGUAGES[regional_lang]['script']} script)
+1. Generate engaging English poster text tailored to the campaign context
+2. Translate ALL text fields into {lang_display} ({lang_script} script)
 
 Translation rules:
-{translation_hint}
+{translation_hint if translation_hint else f"Translate naturally into {lang_display}. Keep brand names, prices, and phone numbers the same."}
 
 Important:
-- Titles must be SHORT and PUNCHY (max 6-8 words)
-- Medical terms like "X-Ray", "ECG", "CT Scan" stay in English in both languages
-- Keep phone numbers, prices, and addresses the same
-- Social captions should be 2-3 sentences max
-- Generate 8-12 relevant hashtags (mix English + regional city/topic)
-- CTA must create urgency (e.g. "Call Now", "Register Today", "Don't Miss!")
-- Badge text: SHORT, CAPS, impactful (FREE CHECKUP / NOW HIRING / MEGA SALE)"""
+- Titles must be SHORT and PUNCHY (max 6-8 words in each language)
+- Technical/medical terms (X-Ray, ECG, CT Scan, NEET, etc.) stay in English in both languages
+- Keep phone numbers, prices, dates, and addresses identical in both languages
+- Social captions: 2-3 sentences max, warm and human
+- Generate 8-12 relevant hashtags (mix English + language-relevant city/topic tags)
+- CTA must create urgency: "Call Now", "Register Today", "Book Your Spot", "Don't Miss!"
+- Badge text: SHORT, CAPS, high impact (FREE CHECKUP / NOW HIRING / MEGA SALE)
+- If the language uses a non-Latin script, ensure proper Unicode output (not romanisation)
+- Return ONLY valid translated text — not instructions, not placeholders, not explanations"""
 
         try:
             result = await LanguageService._call_ai(system_prompt, context, FullContentOutput)
@@ -445,46 +569,63 @@ Important:
                 summary=result.summary,
             )
         except Exception as e:
-            # Fallback — return English-only with error hint in regional
+            # Graceful fallback — return English-only content.
+            # NEVER put raw exception/error text into poster fields (it would render on the poster).
+            logger.error(f"[LanguageService] Bilingual content generation failed after all retries: {e}")
+            title = (
+                f"{inp.department or inp.template_slug.replace('_', ' ').title()} at {inp.city}"
+            )
+            badge_text = tpl.get("badge", "SPECIAL OFFER")
+            cta_text = "Call Now to Register"
+            caption_text = (
+                f"Join us for {inp.template_slug.replace('_', ' ')} in {inp.city}!"
+            )
+            hashtags = [f"#{inp.city.replace(' ', '')}", "#Health", f"#{inp.industry.title()}"]
             return BilingualCampaignContent(
                 language=regional_lang,
-                english_title=f"{inp.department or inp.template_slug.replace('_', ' ').title()} at {inp.city}",
-                regional_title=f"[Translation failed: {str(e)[:50]}]",
+                # English fields — populated with sensible fallback
+                english_title=title,
                 english_subtitle=f"Expert care in {inp.city}",
-                regional_subtitle="",
-                english_badge=tpl["badge"],
-                regional_badge=tpl["badge"],
+                english_badge=badge_text,
                 english_services=services_list,
-                regional_services=services_list,
                 offer_line_english=f"Only {inp.offer_price}" if inp.offer_price else "",
-                offer_line_regional="",
                 date_line_english=inp.date_range or "",
+                english_cta=cta_text,
+                social_caption_english=caption_text,
+                # Regional fields — empty string, NOT error message
+                # The poster will gracefully show only English when regional is empty
+                regional_title="",
+                regional_subtitle="",
+                regional_badge=badge_text,
+                regional_services=services_list,  # Reuse English services as-is
+                offer_line_regional="",
                 date_line_regional="",
-                english_cta="Call Now to Register",
                 regional_cta="",
-                social_caption_english=f"Join us for {inp.template_slug.replace('_', ' ')} at {inp.city}!",
                 social_caption_regional="",
-                hashtags=[f"#{inp.city}", "#Health", f"#{inp.industry}"],
+                hashtags=hashtags,
                 summary=f"Campaign for {inp.template_slug} in {inp.city}",
             )
 
     @staticmethod
-    async def translate_text(text: str, target_language: RegionalLanguage) -> str:
-        """Translate a single text string to the target regional language."""
-        hint = LanguageService.TRANSLATION_GUIDANCE.get(target_language, "")
+    async def translate_text(text: str, target_language: str) -> str:
+        """Translate a single text string to the target language with fallback."""
+        hint = LanguageService.TRANSLATION_GUIDANCE.get(
+            target_language,
+            f"Translate naturally and accurately into {target_language.replace('_', ' ').title()}.",
+        )
 
         class TranslationOutput(BaseModel):
             translated: str
 
         try:
             result = await LanguageService._call_ai(
-                f"You are a translator. {hint} Return JSON with 'translated' field.",
+                f"You are a professional translator. {hint} Return JSON with 'translated' field only.",
                 f"Translate to {target_language}: {text}",
                 TranslationOutput,
             )
             return result.translated
         except Exception:
-            return text
+            return text  # Return original on failure — never crash
 
     @staticmethod
     def get_supported_languages() -> dict:

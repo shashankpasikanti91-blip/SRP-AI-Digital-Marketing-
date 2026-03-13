@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 import PosterRenderer from '../components/poster/PosterRenderer';
@@ -15,19 +15,30 @@ interface PosterVariant {
   status: string;
 }
 
-const PLATFORM_ICONS: Record<string, string> = {
-  instagram_square: '📷',
-  instagram_story: '📱',
-  facebook_post: '👥',
-  whatsapp_share: '💬',
-  linkedin_banner: '💼',
+const PLATFORM_META: Record<string, { icon: string; label: string; color: string; bg: string }> = {
+  instagram_square: { icon: '📸', label: 'Instagram',  color: 'text-pink-600',   bg: 'bg-pink-50 border-pink-200'   },
+  instagram_story:  { icon: '📱', label: 'Story',       color: 'text-purple-600', bg: 'bg-purple-50 border-purple-200' },
+  facebook_post:    { icon: '👥', label: 'Facebook',   color: 'text-blue-600',   bg: 'bg-blue-50 border-blue-200'    },
+  whatsapp_share:   { icon: '💬', label: 'WhatsApp',   color: 'text-green-600',  bg: 'bg-green-50 border-green-200'  },
+  linkedin_banner:  { icon: '💼', label: 'LinkedIn',   color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-200' },
 };
+
+const LANG_LABELS: Record<string, string> = {
+  telugu: 'తెలుగు', hindi: 'हिन्दी', tamil: 'தமிழ்', kannada: 'ಕನ್ನಡ',
+  malayalam: 'മലയാളം', bengali: 'বাংলা', marathi: 'मराठी',
+  gujarati: 'ગુજરાતી', punjabi: 'ਪੰਜਾਬੀ', odia: 'ଓଡ଼ିଆ',
+  malay: 'BM', indonesian: 'ID', thai: 'ไทย', chinese_simplified: '中文',
+};
+
+const PLATFORMS = ['all', 'instagram_square', 'instagram_story', 'facebook_post', 'whatsapp_share', 'linkedin_banner'];
 
 export default function PosterPreview() {
   const qc = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
-  const PAGE_SIZE = 12;
+  const [platformFilter, setPlatformFilter] = useState('all');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const PAGE_SIZE = 20;
 
   const { data: variants = [], isLoading, isError } = useQuery<PosterVariant[]>({
     queryKey: ['poster-variants', page],
@@ -46,34 +57,112 @@ export default function PosterPreview() {
 
   const selectedVariant = variants.find(v => v.id === selectedId);
 
-  // Group variants by campaign_data.template_slug + created date proximity
-  const grouped = variants.reduce((acc, v) => {
+  const copyCaption = useCallback((text: string, id: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  }, []);
+
+  // Group variants by campaign date+template
+  const filtered = platformFilter === 'all' ? variants : variants.filter(v => v.platform === platformFilter);
+  const grouped = filtered.reduce((acc, v) => {
     const key = `${v.campaign_data?.template_slug || 'unknown'}_${v.created_at?.slice(0, 10)}`;
     if (!acc[key]) acc[key] = [];
     acc[key].push(v);
     return acc;
   }, {} as Record<string, PosterVariant[]>);
 
+  const totalPosters = variants.length;
+  const langSet = new Set(variants.map(v => v.campaign_data?.secondary_language).filter(Boolean));
+  const uniqueCampaigns = new Set(variants.map(v => v.campaign_data?.campaign_id)).size;
+
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">🖼️ Poster Gallery</h1>
-            <p className="text-gray-500 mt-1">All generated campaign posters saved here.</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/40">
+      {/* ── Hero header ── */}
+      <div className="bg-gradient-to-r from-indigo-700 via-blue-700 to-blue-600 px-6 py-10 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <span className="text-4xl">🖼️</span>
+                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Poster Gallery</h1>
+              </div>
+              <p className="text-blue-200 text-sm md:text-base">All generated campaign creatives — download, copy & publish instantly.</p>
+            </div>
+            <a
+              href="/app/campaign-builder"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-700 rounded-xl font-bold hover:bg-blue-50 shadow-md text-sm transition-all"
+            >
+              ✨ New Campaign
+            </a>
           </div>
-          <a
-            href="/app/campaign-builder"
-            className="px-5 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 text-sm"
-          >
-            + New Campaign
-          </a>
+
+          {/* Stats strip */}
+          {totalPosters > 0 && (
+            <div className="flex flex-wrap gap-6 mt-6 pt-6 border-t border-white/20 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold">{totalPosters}</span>
+                <span className="text-blue-200">Posters Created</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold">{uniqueCampaigns || '—'}</span>
+                <span className="text-blue-200">Campaigns</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold">{langSet.size || 1}</span>
+                <span className="text-blue-200">Languages</span>
+              </div>
+              {langSet.size > 0 && (
+                <div className="flex items-center gap-1 flex-wrap">
+                  {[...langSet].map(lang => (
+                    <span key={lang} className="px-2 py-0.5 bg-white/20 rounded-full text-xs font-medium">
+                      {LANG_LABELS[lang as string] || lang}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+
+        {/* Platform filter tabs */}
+        {!selectedId && !isLoading && variants.length > 0 && (
+          <div className="flex gap-2 flex-wrap mb-6">
+            {PLATFORMS.map(p => {
+              const meta = PLATFORM_META[p];
+              const active = platformFilter === p;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPlatformFilter(p)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                    active
+                      ? 'bg-indigo-600 text-white border-indigo-600 shadow'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                  }`}
+                >
+                  {meta ? `${meta.icon} ${meta.label}` : '🌐 All'}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {isLoading && (
-          <div className="flex items-center justify-center py-20 text-gray-400">
-            <div className="animate-spin text-4xl mr-3">⏳</div>
-            <span className="text-lg">Loading posters...</span>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 animate-pulse">
+                <div className="bg-gray-200 h-48" />
+                <div className="p-3 space-y-2">
+                  <div className="h-3 bg-gray-200 rounded w-3/4" />
+                  <div className="h-2 bg-gray-100 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -102,128 +191,230 @@ export default function PosterPreview() {
           </div>
         )}
 
-        {/* Gallery grid */}
-        {!selectedId && !isError && variants.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {variants.map(variant => (
-              <div
-                key={variant.id}
-                onClick={() => setSelectedId(variant.id)}
-                className="cursor-pointer group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:border-blue-300 transition-all"
-              >
-                <div className="relative bg-gray-100 flex items-center justify-center p-2">
-                  <PosterRenderer posterJson={variant.poster_json} scale={0.15} />
-                  <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
-                    {PLATFORM_ICONS[variant.platform]} {variant.platform?.replace('_', ' ')}
+        {/* Gallery — grouped by campaign */}
+        {!selectedId && !isError && filtered.length > 0 && (
+          <div className="space-y-8">
+            {Object.entries(grouped).map(([key, group]) => {
+              const sample = group[0];
+              const slug = sample.campaign_data?.template_slug?.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) || 'Campaign';
+              const city = sample.campaign_data?.city || '';
+              const date = new Date(sample.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+              const secLang = sample.campaign_data?.secondary_language;
+              return (
+                <div key={key}>
+                  {/* Campaign group header */}
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex-1 flex items-center gap-2">
+                      <span className="text-lg font-bold text-gray-800">{slug}</span>
+                      {city && <span className="text-sm text-gray-500">· {city}</span>}
+                      <span className="text-xs text-gray-400">· {date}</span>
+                      {secLang && (
+                        <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full">
+                          🌐 EN + {LANG_LABELS[secLang] || secLang}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-400">{group.length} variant{group.length !== 1 ? 's' : ''}</span>
                   </div>
-                </div>
-                <div className="p-3">
-                  <div className="font-semibold text-gray-800 text-xs truncate">
-                    {variant.campaign_data?.template_slug?.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-0.5">
-                    {variant.campaign_data?.city || '—'} •{' '}
-                    {new Date(variant.created_at).toLocaleDateString()}
-                  </div>
-                  {variant.campaign_data?.secondary_language && (
-                    <span className="inline-block mt-1 px-2 py-0.5 bg-indigo-50 text-indigo-600 text-xs rounded-full">
-                      EN + {variant.campaign_data.secondary_language}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
 
-        {/* Detail view */}
-        {selectedId && selectedVariant && (
-          <div>
-            <div className="flex items-center gap-3 mb-6">
-              <button
-                onClick={() => setSelectedId(null)}
-                className="px-3 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm"
-              >
-                ← Back to Gallery
-              </button>
-              <div className="text-gray-800 font-semibold">
-                {selectedVariant.campaign_data?.template_slug?.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}
-                {' '}— {selectedVariant.campaign_data?.city}
-              </div>
-              <div className="ml-auto">
-                <button
-                  onClick={() => { if (window.confirm('Delete this poster?')) deleteMutation.mutate(selectedId); }}
-                  className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg border border-red-200"
-                >
-                  🗑 Delete
-                </button>
-              </div>
-            </div>
+                  {/* Variant cards */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {group.map(variant => {
+                      const pmeta = PLATFORM_META[variant.platform] || { icon: '🖼', label: variant.platform, color: 'text-gray-600', bg: 'bg-gray-50 border-gray-200' };
+                      return (
+                        <div
+                          key={variant.id}
+                          onClick={() => setSelectedId(variant.id)}
+                          className="cursor-pointer group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 hover:border-blue-300 transition-all duration-200"
+                        >
+                          {/* Poster thumbnail */}
+                          <div className="relative overflow-hidden bg-gray-50 flex items-center justify-center" style={{ minHeight: 180 }}>
+                            <PosterRenderer posterJson={variant.poster_json} scale={0.18} />
+                            {/* Platform badge overlay */}
+                            <div className={`absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${pmeta.bg} ${pmeta.color}`}>
+                              {pmeta.icon} {pmeta.label}
+                            </div>
+                            {/* Hover overlay */}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                              <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full shadow">
+                                View →
+                              </span>
+                            </div>
+                          </div>
 
-            {/* Poster + caption */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <PosterRenderer posterJson={selectedVariant.poster_json} scale={0.45} showDownload />
-              </div>
-
-              <div className="space-y-4">
-                {/* Campaign info */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                  <h3 className="font-semibold text-gray-800 mb-3">📋 Campaign Details</h3>
-                  <div className="space-y-2 text-sm">
-                    {Object.entries(selectedVariant.campaign_data || {}).map(([key, val]) => (
-                      val && typeof val !== 'object' ? (
-                        <div key={key} className="flex gap-2">
-                          <span className="text-gray-500 w-32 shrink-0">{key.replace(/_/g, ' ')}</span>
-                          <span className="text-gray-800 font-medium">{String(val)}</span>
+                          {/* Card footer */}
+                          <div className="p-3 border-t border-gray-50">
+                            {variant.campaign_data?.secondary_language ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-indigo-600 text-xs">🌐</span>
+                                <span className="text-xs font-semibold text-indigo-700">
+                                  {LANG_LABELS[variant.campaign_data.secondary_language] || variant.campaign_data.secondary_language} Bilingual
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="text-xs text-gray-500 truncate">{slug}</div>
+                            )}
+                            <div className="text-xs text-gray-400 mt-0.5 truncate">
+                              {variant.campaign_data?.city || variant.campaign_data?.industry || '—'}
+                            </div>
+                          </div>
                         </div>
-                      ) : null
-                    ))}
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── Detail view ── */}
+        {selectedId && selectedVariant && (() => {
+          const pmeta = PLATFORM_META[selectedVariant.platform] || { icon: '🖼', label: selectedVariant.platform, color: 'text-gray-600', bg: 'bg-gray-50 border-gray-200' };
+          const slug = selectedVariant.campaign_data?.template_slug?.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) || 'Poster';
+          const secLang = selectedVariant.campaign_data?.secondary_language;
+          return (
+            <div>
+              {/* Breadcrumb / toolbar */}
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <button
+                  onClick={() => setSelectedId(null)}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium shadow-sm"
+                >
+                  ← Gallery
+                </button>
+                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold ${pmeta.bg} ${pmeta.color}`}>
+                  {pmeta.icon} {pmeta.label}
+                </div>
+                <div className="text-gray-800 font-bold text-lg hidden sm:block">{slug}</div>
+                {secLang && (
+                  <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full">
+                    🌐 Bilingual: EN + {LANG_LABELS[secLang] || secLang}
+                  </span>
+                )}
+                <div className="ml-auto flex gap-2">
+                  <button
+                    onClick={() => { if (window.confirm('Delete this poster?')) deleteMutation.mutate(selectedId!); }}
+                    className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg border border-red-200 font-medium"
+                  >
+                    🗑 Delete
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                {/* Poster — left column (wide) */}
+                <div className="lg:col-span-3 bg-white rounded-2xl shadow border border-gray-100 p-6 flex flex-col items-center">
+                  <PosterRenderer posterJson={selectedVariant.poster_json} scale={0.50} showDownload />
+                  {/* Sibling variants */}
+                  <div className="mt-5 w-full">
+                    <p className="text-xs text-gray-400 mb-2 font-semibold uppercase tracking-wide">Other variants in this campaign</p>
+                    <div className="flex gap-3 overflow-x-auto pb-1">
+                      {variants
+                        .filter(v => v.id !== selectedId &&
+                          v.campaign_data?.template_slug === selectedVariant.campaign_data?.template_slug &&
+                          v.created_at?.slice(0, 10) === selectedVariant.created_at?.slice(0, 10)
+                        )
+                        .map(v => {
+                          const vm = PLATFORM_META[v.platform] || { icon: '🖼', label: v.platform, color: 'text-gray-500', bg: 'bg-gray-50 border-gray-200' };
+                          return (
+                            <button
+                              key={v.id}
+                              onClick={() => setSelectedId(v.id)}
+                              className={`shrink-0 flex flex-col items-center gap-1 p-2 rounded-xl border text-xs font-semibold ${vm.bg} ${vm.color} hover:shadow-md transition-all`}
+                            >
+                              <div className="rounded-lg overflow-hidden" style={{ width: 60, height: 60 }}>
+                                <PosterRenderer posterJson={v.poster_json} scale={0.05} />
+                              </div>
+                              <span>{vm.icon} {vm.label}</span>
+                            </button>
+                          );
+                        })}
+                    </div>
                   </div>
                 </div>
 
-                {/* Caption */}
-                {selectedVariant.social_caption && (
-                  <div className="bg-gray-50 rounded-2xl border border-gray-200 p-5">
-                    <h3 className="font-semibold text-gray-800 mb-2">📝 Social Caption</h3>
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-                      {selectedVariant.social_caption}
-                    </p>
+                {/* Sidebar — right column */}
+                <div className="lg:col-span-2 space-y-4">
+                  {/* Campaign details card */}
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <h3 className="font-bold text-gray-700 text-sm uppercase tracking-wide mb-3">📋 Campaign Details</h3>
+                    <div className="space-y-2">
+                      {Object.entries(selectedVariant.campaign_data || {}).map(([k, val]) =>
+                        val && typeof val !== 'object' ? (
+                          <div key={k} className="flex gap-2 text-sm">
+                            <span className="text-gray-400 w-28 shrink-0 capitalize">{k.replace(/_/g, ' ')}</span>
+                            <span className="text-gray-800 font-semibold">{String(val)}</span>
+                          </div>
+                        ) : null
+                      )}
+                    </div>
                   </div>
-                )}
 
-                {/* Hashtags */}
-                {selectedVariant.hashtags && selectedVariant.hashtags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedVariant.hashtags.map(tag => (
-                      <span key={tag} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-full">{tag}</span>
-                    ))}
-                  </div>
-                )}
+                  {/* Social caption */}
+                  {selectedVariant.social_caption && (
+                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl border border-indigo-100 p-5">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-bold text-gray-700 text-sm uppercase tracking-wide">📝 Social Caption</h3>
+                        <button
+                          onClick={() => copyCaption(selectedVariant.social_caption!, selectedVariant.id)}
+                          className={`text-xs px-3 py-1 rounded-full border font-semibold transition-all ${
+                            copiedId === selectedVariant.id
+                              ? 'bg-green-100 text-green-700 border-green-300'
+                              : 'bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50'
+                          }`}
+                        >
+                          {copiedId === selectedVariant.id ? '✓ Copied!' : '📋 Copy'}
+                        </button>
+                      </div>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                        {selectedVariant.social_caption}
+                      </p>
+                    </div>
+                  )}
 
-                {/* Poster JSON (developer view) */}
-                <details className="bg-gray-900 rounded-2xl p-4 text-xs text-green-400 cursor-pointer">
-                  <summary className="text-gray-400 mb-2">🔧 View Poster JSON</summary>
-                  <pre className="overflow-auto max-h-64 mt-2">
-                    {JSON.stringify(selectedVariant.poster_json, null, 2)}
-                  </pre>
-                </details>
+                  {/* Hashtags */}
+                  {selectedVariant.hashtags && selectedVariant.hashtags.length > 0 && (
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                      <h3 className="font-bold text-gray-700 text-xs uppercase tracking-wide mb-2">🏷️ Hashtags</h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedVariant.hashtags.map(tag => (
+                          <span key={tag} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-full font-medium">{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Dev JSON panel */}
+                  <details className="bg-gray-950 rounded-2xl overflow-hidden text-xs cursor-pointer">
+                    <summary className="px-4 py-3 text-gray-400 font-mono hover:text-gray-300 select-none">🔧 Poster JSON (debug)</summary>
+                    <pre className="overflow-auto max-h-64 px-4 pb-4 text-green-400 leading-relaxed">
+                      {JSON.stringify(selectedVariant.poster_json, null, 2)}
+                    </pre>
+                  </details>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Pagination */}
         {!selectedId && (variants.length >= PAGE_SIZE || page > 0) && (
-          <div className="flex justify-center gap-3 mt-8">
+          <div className="flex justify-center gap-3 mt-10">
             {page > 0 && (
-              <button onClick={() => setPage(p => p - 1)} className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm">
+              <button
+                onClick={() => setPage(p => p - 1)}
+                className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold shadow-sm hover:border-blue-300"
+              >
                 ← Previous
               </button>
             )}
             {variants.length >= PAGE_SIZE && (
-              <button onClick={() => setPage(p => p + 1)} className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm">
-                Next →
+              <button
+                onClick={() => setPage(p => p + 1)}
+                className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold shadow-sm hover:bg-indigo-700"
+              >
+                Next Page →
               </button>
             )}
           </div>

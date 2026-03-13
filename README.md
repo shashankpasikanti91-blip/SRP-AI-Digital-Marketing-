@@ -53,6 +53,22 @@ python backend/seed_bunty.py   # bunty@srp.ai healthcare account
 
 ---
 
+## Multilingual Campaign Posters (14 Languages, 7 Countries)
+
+Generate bilingual poster designs in **14 languages** - English + regional script rendered inside the visual template.
+
+| Region | Languages | Markets |
+|--------|-----------|---------|
+| India | Telugu, Hindi, Tamil, Kannada, Malayalam, Bengali, Marathi, Gujarati, Punjabi, Odia | IN |
+| SE Asia | Malay, Indonesian, Thai, Chinese Simplified | MY, SG, ID, TH |
+
+**AI Model Routing for Translation:**
+- Primary: OpenAI gpt-4o-mini direct (most reliable for Indian scripts + SE Asian)
+- Fallback: OpenRouter Gemini Flash 1.5 (auto-retried on provider error)
+- Both keys recommended in .env: OPENAI_API_KEY + OPENROUTER_API_KEY
+
+---
+
 ## ðŸ’° India Pricing Plans
 
 > All prices in Indian Rupees (INR) + 18% GST. Annual billing saves 20%.

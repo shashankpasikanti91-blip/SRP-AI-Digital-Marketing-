@@ -279,11 +279,22 @@ const TEMPLATES = [
 ];
 
 const LANGUAGE_OPTIONS = [
-  { value: 'telugu', label: 'తెలుగు Telugu' },
-  { value: 'hindi', label: 'हिंदी Hindi' },
-  { value: 'tamil', label: 'தமிழ் Tamil' },
-  { value: 'kannada', label: 'ಕನ್ನಡ Kannada' },
-  { value: 'malayalam', label: 'മലയാളം Malayalam' },
+  // ── Indian Languages ────────────────────────────────────────────────
+  { value: 'telugu',    label: 'తెలుగు Telugu',        region: '🇮🇳 India' },
+  { value: 'hindi',     label: 'हिंदी Hindi',           region: '🇮🇳 India' },
+  { value: 'tamil',     label: 'தமிழ் Tamil',           region: '🇮🇳 India' },
+  { value: 'kannada',   label: 'ಕನ್ನಡ Kannada',         region: '🇮🇳 India' },
+  { value: 'malayalam', label: 'മലയാളം Malayalam',      region: '🇮🇳 India' },
+  { value: 'bengali',   label: 'বাংলা Bengali',         region: '🇮🇳 India' },
+  { value: 'marathi',   label: 'मराठी Marathi',         region: '🇮🇳 India' },
+  { value: 'gujarati',  label: 'ગુજરાતી Gujarati',      region: '🇮🇳 India' },
+  { value: 'punjabi',   label: 'ਪੰਜਾਬੀ Punjabi',        region: '🇮🇳 India' },
+  { value: 'odia',      label: 'ଓଡ଼ିଆ Odia',            region: '🇮🇳 India' },
+  // ── South-East Asia ─────────────────────────────────────────────────
+  { value: 'malay',              label: 'Bahasa Melayu',       region: '🇲🇾 Malaysia' },
+  { value: 'indonesian',         label: 'Bahasa Indonesia',    region: '🇮🇩 Indonesia' },
+  { value: 'thai',               label: 'ภาษาไทย Thai',        region: '🇹🇭 Thailand' },
+  { value: 'chinese_simplified', label: '简体中文 Chinese',      region: '🇲🇾🇸🇬 MY/SG' },
 ];
 
 const COLOR_MAP: Record<string, string> = {
@@ -553,30 +564,57 @@ export default function CampaignBuilder() {
         <div>
           <button onClick={() => setStep(2)} className="text-sm text-blue-600 mb-4 hover:underline">← Back to details</button>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Step 3: Choose Regional Language</h2>
-          <p className="text-sm text-gray-500 mb-6">The poster will be generated with both English and your chosen regional language.</p>
+          <p className="text-sm text-gray-500 mb-6">The poster will be generated in <strong>English + your chosen language</strong>. Supports 14 languages across India, SE Asia & Oceania.</p>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-            {LANGUAGE_OPTIONS.map(lang => (
-              <div
-                key={lang.value}
-                onClick={() => setSecondaryLang(lang.value)}
-                className={`cursor-pointer rounded-2xl border-2 p-5 text-center transition-all ${
-                  secondaryLang === lang.value
-                    ? 'border-indigo-500 bg-indigo-50'
-                    : 'border-gray-200 bg-white hover:border-indigo-300'
-                }`}
-              >
-                <div className="text-2xl mb-1">{lang.label.split(' ')[0]}</div>
-                <div className={`font-semibold ${secondaryLang === lang.value ? 'text-indigo-700' : 'text-gray-700'}`}>
-                  {lang.label.split(' ')[1]}
+          {/* India group */}
+          <div className="mb-5">
+            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">🇮🇳 Indian Languages</div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              {LANGUAGE_OPTIONS.filter(l => l.region?.includes('India')).map(lang => (
+                <div
+                  key={lang.value}
+                  onClick={() => setSecondaryLang(lang.value)}
+                  className={`cursor-pointer rounded-xl border-2 p-3 text-center transition-all ${
+                    secondaryLang === lang.value
+                      ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                      : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/40'
+                  }`}
+                >
+                  <div className="text-xl mb-0.5">{lang.label.split(' ')[0]}</div>
+                  <div className={`text-xs font-semibold ${secondaryLang === lang.value ? 'text-indigo-700' : 'text-gray-600'}`}>
+                    {lang.label.split(' ').slice(1).join(' ') || lang.label}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          {/* SE Asia group */}
+          <div className="mb-6">
+            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">🌏 South-East Asia</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {LANGUAGE_OPTIONS.filter(l => !l.region?.includes('India')).map(lang => (
+                <div
+                  key={lang.value}
+                  onClick={() => setSecondaryLang(lang.value)}
+                  className={`cursor-pointer rounded-xl border-2 p-3 text-center transition-all ${
+                    secondaryLang === lang.value
+                      ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                      : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/40'
+                  }`}
+                >
+                  <div className="text-base font-semibold mb-0.5">{lang.region}</div>
+                  <div className={`text-xs font-semibold ${secondaryLang === lang.value ? 'text-indigo-700' : 'text-gray-600'}`}>
+                    {lang.label}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-sm text-blue-800">
-            💡 AI will generate campaign text in <strong>English + {LANGUAGE_OPTIONS.find(l => l.value === secondaryLang)?.label.split(' ')[1]}</strong>,
-            then build posters for Instagram, Facebook, WhatsApp, and LinkedIn automatically.
+            💡 AI will generate campaign text in <strong>English + {LANGUAGE_OPTIONS.find(l => l.value === secondaryLang)?.label || secondaryLang}</strong>,
+            then build visually-designed posters for Instagram, Facebook, WhatsApp, and LinkedIn automatically.
           </div>
 
           <div className="flex justify-end">
@@ -592,7 +630,7 @@ export default function CampaignBuilder() {
 
           {generateMutation.isError && (
             <div className="mt-3 text-red-500 text-sm text-center">
-              Generation failed. Make sure OpenAI API key is configured.
+              Generation failed. Make sure the AI provider API key is configured.
             </div>
           )}
         </div>
@@ -626,9 +664,15 @@ export default function CampaignBuilder() {
                   <div className="text-gray-600">{result.summary.bilingual_content.english_subtitle}</div>
                 </div>
                 <div>
-                  <div className="font-medium text-gray-600 mb-1">{secondaryLang.charAt(0).toUpperCase() + secondaryLang.slice(1)}</div>
-                  <div className="font-bold text-gray-900">{result.summary.bilingual_content.regional_title}</div>
-                  <div className="text-gray-600">{result.summary.bilingual_content.regional_subtitle}</div>
+                  <div className="font-medium text-gray-600 mb-1">{LANGUAGE_OPTIONS.find(l => l.value === secondaryLang)?.label || secondaryLang}</div>
+                  {result.summary.bilingual_content.regional_title ? (
+                    <>
+                      <div className="font-bold text-gray-900">{result.summary.bilingual_content.regional_title}</div>
+                      <div className="text-gray-600">{result.summary.bilingual_content.regional_subtitle}</div>
+                    </>
+                  ) : (
+                    <div className="text-gray-400 text-xs italic">Translation in progress or unavailable — English used</div>
+                  )}
                 </div>
               </div>
             </div>
