@@ -24,6 +24,7 @@ httpx>=0.27.0
 # ── Auth & Security ───────────────────────────────────────────────────
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+bcrypt>=3.2.0,<4.0.0  # passlib 1.7.4 incompatible with bcrypt 4.x (removed __about__)
 
 # ── Task Queue ────────────────────────────────────────────────────────
 celery[redis]==5.4.0

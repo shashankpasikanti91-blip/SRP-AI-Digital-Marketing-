@@ -15,7 +15,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import JSONB
 
 revision = "008_global_localization"
-down_revision = "007_add_regional_marketing_tables"
+down_revision = "007"
 branch_labels = None
 depends_on = None
 
@@ -37,7 +37,7 @@ def upgrade() -> None:
         sa.Column("language_modes", JSONB, nullable=True),
         sa.Column("marketing_style", sa.Text(), nullable=True),
         sa.Column("festival_calendar_reference", sa.String(60), nullable=True),
-        sa.Column("is_active", sa.Boolean(), default=True, nullable=False),
+        sa.Column("is_active", sa.Boolean(), server_default=sa.text('true'), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
     )
 
@@ -67,7 +67,7 @@ def upgrade() -> None:
         sa.Column("script", sa.String(40), nullable=True),
         sa.Column("direction", sa.String(5), default="ltr", nullable=False),
         sa.Column("countries", JSONB, nullable=True),
-        sa.Column("is_active", sa.Boolean(), default=True, nullable=False),
+        sa.Column("is_active", sa.Boolean(), server_default=sa.text('true'), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
     )
 
@@ -146,7 +146,7 @@ def upgrade() -> None:
         sa.Column("rule_key", sa.String(80), nullable=False),
         sa.Column("rule_value", sa.Text(), nullable=False),
         sa.Column("metadata", JSONB, nullable=True),
-        sa.Column("is_active", sa.Boolean(), default=True, nullable=False),
+        sa.Column("is_active", sa.Boolean(), server_default=sa.text('true'), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
     )
 
