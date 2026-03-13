@@ -44,7 +44,9 @@ class ConversationAgent:
     """Agent 7: Generates AI replies for customer conversations."""
 
     def __init__(self):
-        self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        from app.services.model_router import get_model_router, FeatureBucket
+        router = get_model_router()
+        self._client, self._model = router.resolve(FeatureBucket.chatbot)
 
     async def run(
         self,
@@ -89,7 +91,7 @@ class ConversationAgent:
         })
 
         response = await self._client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=self._model,
             messages=messages_for_api,
             response_format={"type": "json_object"},
             max_tokens=800,

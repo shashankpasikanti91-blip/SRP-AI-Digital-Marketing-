@@ -46,7 +46,9 @@ class LeadCaptureAgent:
     """Agent 5: Normalises raw lead data into standard CRM record."""
 
     def __init__(self):
-        self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        from app.services.model_router import get_model_router, FeatureBucket
+        router = get_model_router()
+        self._client, self._model = router.resolve(FeatureBucket.lead_classification)
 
     def _quick_normalise(self, raw_name: str) -> tuple[str, str]:
         """Fast name splitting without AI."""
@@ -87,7 +89,7 @@ Normalise this lead data, detect intent signals and urgency. Return JSON matchin
 {json.dumps(NormalisedLead.model_json_schema(), indent=2)}
 """
         response = await self._client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=self._model,
             messages=[
                 {"role": "system", "content": LEAD_CAPTURE_SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},

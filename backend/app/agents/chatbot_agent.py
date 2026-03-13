@@ -46,10 +46,10 @@ Keep responses concise — 2-4 paragraphs max unless a detailed how-to is needed
 class ChatbotAgent:
     """Focused platform support chatbot using gpt-4o-mini."""
 
-    SAFE_MODEL = "gpt-4o-mini"
-
     def __init__(self):
-        self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        from app.services.model_router import get_model_router, FeatureBucket
+        router = get_model_router()
+        self._client, self._model = router.resolve(FeatureBucket.chatbot)
 
     async def chat(
         self,
@@ -82,7 +82,7 @@ class ChatbotAgent:
         messages.append({"role": "user", "content": user_message})
 
         response = await self._client.chat.completions.create(
-            model=self.SAFE_MODEL,
+            model=self._model,
             messages=messages,
             max_tokens=1000,
             temperature=0.6,
@@ -118,7 +118,7 @@ class ChatbotAgent:
         messages.append({"role": "user", "content": user_message})
 
         stream = await self._client.chat.completions.create(
-            model=self.SAFE_MODEL,
+            model=self._model,
             messages=messages,
             max_tokens=1000,
             temperature=0.6,

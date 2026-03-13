@@ -52,7 +52,9 @@ class CRMPipelineAgent:
     """Agent 9: Manages CRM stages and provides pipeline decisions."""
 
     def __init__(self):
-        self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        from app.services.model_router import get_model_router, FeatureBucket
+        router = get_model_router()
+        self._client, self._model = router.resolve(FeatureBucket.lead_classification)
 
     async def run(
         self,
@@ -89,7 +91,7 @@ Analyse this deal and provide a pipeline decision. Return JSON matching:
 {json.dumps(PipelineDecision.model_json_schema(), indent=2)}
 """
         response = await self._client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=self._model,
             messages=[
                 {"role": "system", "content": CRM_PIPELINE_SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},

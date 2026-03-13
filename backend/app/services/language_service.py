@@ -315,12 +315,13 @@ class LanguageService:
 
     @staticmethod
     async def _call_ai(system: str, prompt: str, output_model: type[BaseModel]):
-        """Call OpenAI and parse structured JSON output."""
-        import openai
-        client = openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        """Call AI via ModelRouter (uses OpenRouter by default) and parse structured JSON output."""
+        from app.services.model_router import get_model_router, FeatureBucket
+        router = get_model_router()
+        client, model = router.resolve(FeatureBucket.translation)
         schema = output_model.model_json_schema()
         response = await client.chat.completions.create(
-            model="gpt-4o",
+            model=model,
             messages=[
                 {
                     "role": "system",

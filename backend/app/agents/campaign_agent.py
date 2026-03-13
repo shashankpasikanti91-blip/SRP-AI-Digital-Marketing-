@@ -59,7 +59,9 @@ class CampaignAgent:
     """Agent 4: Creates full campaign plans."""
 
     def __init__(self):
-        self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        from app.services.model_router import get_model_router, FeatureBucket
+        router = get_model_router()
+        self._client, self._model = router.resolve(FeatureBucket.campaign_strategy)
 
     async def run(
         self,
@@ -90,7 +92,7 @@ Create a detailed, actionable campaign plan. Return JSON matching this schema:
 {json.dumps(CampaignPlanOutput.model_json_schema(), indent=2)}
 """
         response = await self._client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=self._model,
             messages=[
                 {"role": "system", "content": CAMPAIGN_SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},

@@ -134,16 +134,17 @@ async def ai_chat(payload: ChatRequest, tenant: CurrentTenant):
 
 
 async def _stream_chat(system: str, messages: List[ChatMessage]) -> AsyncGenerator[str, None]:
-    """Yield SSE chunks from OpenAI streaming."""
+    """Yield SSE chunks from AI streaming via ModelRouter (OpenRouter by default)."""
     try:
-        import openai
-        client = openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        from app.services.model_router import get_model_router, FeatureBucket
+        router = get_model_router()
+        client, model = router.resolve(FeatureBucket.chatbot)
 
         msgs = [{"role": "system", "content": system}]
         msgs += [{"role": m.role, "content": m.content} for m in messages]
 
         stream = await client.chat.completions.create(
-            model="gpt-4o",
+            model=model,
             messages=msgs,
             stream=True,
             max_tokens=settings.AI_MAX_TOKENS,

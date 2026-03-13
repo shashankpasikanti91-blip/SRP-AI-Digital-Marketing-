@@ -54,7 +54,9 @@ class LeadQualificationAgent:
     """Agent 6: Scores and qualifies leads with detailed reasoning."""
 
     def __init__(self):
-        self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        from app.services.model_router import get_model_router, FeatureBucket
+        router = get_model_router()
+        self._client, self._model = router.resolve(FeatureBucket.lead_classification)
 
     async def run(
         self,
@@ -90,7 +92,7 @@ Qualify this lead thoroughly. Return JSON matching:
 {json.dumps(QualificationOutput.model_json_schema(), indent=2)}
 """
         response = await self._client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=self._model,
             messages=[
                 {"role": "system", "content": QUALIFICATION_SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},

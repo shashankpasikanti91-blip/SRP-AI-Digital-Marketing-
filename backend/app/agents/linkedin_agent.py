@@ -143,8 +143,9 @@ class LinkedInAgent:
     """Agent 11: LinkedIn Recruitment & B2B Marketing Agent for Indian IT market."""
 
     def __init__(self):
-        self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
-        self._model = "gpt-4o"
+        from app.services.model_router import get_model_router, FeatureBucket
+        router = get_model_router()
+        self._client, self._model = router.resolve(FeatureBucket.text_marketing)
 
     # ── Job Post Generation ─────────────────────────────────────────────
 

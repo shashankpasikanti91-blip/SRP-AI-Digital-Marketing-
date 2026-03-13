@@ -63,7 +63,9 @@ class AnalyticsAgent:
     """Agent 10: Analyses performance and generates optimization recommendations."""
 
     def __init__(self):
-        self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        from app.services.model_router import get_model_router, FeatureBucket
+        router = get_model_router()
+        self._client, self._model = router.resolve(FeatureBucket.campaign_strategy)
 
     async def run(
         self,
@@ -102,7 +104,7 @@ Provide a comprehensive analytics and optimization report. Return JSON matching:
 {json.dumps(OptimizationOutput.model_json_schema(), indent=2)}
 """
         response = await self._client.chat.completions.create(
-            model="gpt-4o",
+            model=self._model,
             messages=[
                 {"role": "system", "content": ANALYTICS_SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},
