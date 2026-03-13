@@ -239,17 +239,6 @@ class LanguageService:
             "Use clear, concise business/marketing language. Keep medical terms readable. "
             "Example: 'Free Health Camp' → '免费健康营'"
         ),
-    }            "Keep medical and technical terms in English where commonly understood. "
-            "Example: 'Free Health Camp' → 'இலவச உடல்நல முகாம்'"
-        ),
-        "kannada": (
-            "Translate to natural Kannada used in Karnataka (Kannada script). "
-            "Example: 'Free Health Camp' → 'ಉಚಿತ ಆರೋಗ್ಯ ಶಿಬಿರ'"
-        ),
-        "malayalam": (
-            "Translate to natural Malayalam (Malayalam script). "
-            "Example: 'Free Health Camp' → 'സൗജന്യ ആരോഗ്യ ക്യാമ്പ്'"
-        ),
     }
 
     # ── Template content generators (English base) ────────────────────
