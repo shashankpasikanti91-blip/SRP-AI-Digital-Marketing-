@@ -654,29 +654,62 @@ export default function CampaignBuilder() {
           </div>
 
           {/* Bilingual content summary */}
-          {result.summary?.bilingual_content && (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-4 mb-6">
-              <h3 className="font-semibold text-gray-800 mb-3">📝 Generated Content</h3>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <div className="font-medium text-gray-600 mb-1">English</div>
-                  <div className="font-bold text-gray-900">{result.summary.bilingual_content.english_title}</div>
-                  <div className="text-gray-600">{result.summary.bilingual_content.english_subtitle}</div>
+          {result.summary?.bilingual_content && (() => {
+            const bc = result.summary.bilingual_content;
+            const langLabel = LANGUAGE_OPTIONS.find(l => l.value === secondaryLang)?.label || secondaryLang;
+            const hasRegional = !!bc.regional_title;
+            return (
+              <div className="rounded-2xl border overflow-hidden mb-6 shadow-sm">
+                {/* Header */}
+                <div className="flex items-center justify-between bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2.5">
+                  <span className="text-white text-sm font-semibold">📝 Generated Content</span>
+                  <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${hasRegional ? 'bg-emerald-400 text-emerald-900' : 'bg-amber-300 text-amber-900'}`}>
+                    {hasRegional ? `✓ Bilingual (EN + ${langLabel})` : '⚠ English only'}
+                  </span>
                 </div>
-                <div>
-                  <div className="font-medium text-gray-600 mb-1">{LANGUAGE_OPTIONS.find(l => l.value === secondaryLang)?.label || secondaryLang}</div>
-                  {result.summary.bilingual_content.regional_title ? (
-                    <>
-                      <div className="font-bold text-gray-900">{result.summary.bilingual_content.regional_title}</div>
-                      <div className="text-gray-600">{result.summary.bilingual_content.regional_subtitle}</div>
-                    </>
-                  ) : (
-                    <div className="text-gray-400 text-xs italic">Translation in progress or unavailable — English used</div>
-                  )}
+                {/* Content columns */}
+                <div className="grid grid-cols-2 divide-x divide-gray-100 bg-white">
+                  {/* English */}
+                  <div className="p-4">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="text-base">🇬🇧</span>
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">English</span>
+                    </div>
+                    <p className="font-bold text-gray-900 text-sm leading-snug mb-1">{bc.english_title}</p>
+                    <p className="text-xs text-gray-500 leading-relaxed">{bc.english_subtitle}</p>
+                    {bc.english_cta && (
+                      <span className="inline-block mt-2 text-xs bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">{bc.english_cta}</span>
+                    )}
+                  </div>
+                  {/* Regional */}
+                  <div className="p-4">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="text-base">🌐</span>
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{langLabel}</span>
+                    </div>
+                    {hasRegional ? (
+                      <>
+                        <p className="font-bold text-gray-900 text-sm leading-snug mb-1">{bc.regional_title}</p>
+                        <p className="text-xs text-gray-500 leading-relaxed">{bc.regional_subtitle}</p>
+                        {bc.regional_cta && (
+                          <span className="inline-block mt-2 text-xs bg-indigo-100 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">{bc.regional_cta}</span>
+                        )}
+                      </>
+                    ) : (
+                      <div className="flex flex-col gap-1.5 mt-1">
+                        <p className="text-xs text-amber-700 font-medium leading-relaxed">
+                          Translation couldn't be generated — AI API may not be configured.
+                        </p>
+                        <p className="text-xs text-gray-400 leading-relaxed">
+                          Set <code className="bg-gray-100 px-1 rounded">OPENAI_API_KEY</code> in <code className="bg-gray-100 px-1 rounded">.env</code> to enable bilingual output.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Hashtags */}
           {result.summary?.hashtags && result.summary.hashtags.length > 0 && (

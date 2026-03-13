@@ -10,6 +10,63 @@ interface PosterData {
   meta?: Record<string, any>;
 }
 
+/**
+ * Swap text layers to their regional equivalents when the user picks the
+ * regional preview language.
+ *
+ * Strategy:
+ *  - Every layer with role ending in `_english` gets its text swapped with
+ *    the matching `_regional` layer (same role prefix) if that layer exists
+ *    and has a non-empty `text` field.
+ *  - Standalone `_regional` layers are then removed (they were only needed for
+ *    the bilingual combined view; in regional-only mode we embed them inline).
+ *  - If a `_regional` match has no text we leave the English text in place so
+ *    the poster never renders a blank block.
+ */
+function getPosterForView(poster: PosterData, view: 'english' | 'regional'): PosterData {
+  if (view === 'english' || !poster.layers) return poster;
+
+  const layers = poster.layers;
+
+  // Build lookup: english_role_key → regional layer
+  const regionalByEnglishKey = new Map<string, any>();
+  layers.forEach(layer => {
+    const role: string = layer.role || '';
+    if (role.endsWith('_regional')) {
+      regionalByEnglishKey.set(role.replace('_regional', '_english'), layer);
+    }
+  });
+
+  const processed = layers
+    .map(layer => {
+      const role: string = layer.role || '';
+      if (role.endsWith('_english')) {
+        const reg = regionalByEnglishKey.get(role);
+        if (reg && reg.text && reg.text.trim() !== '') {
+          return {
+            ...layer,
+            text: reg.text,
+            font_family: reg.font_family || layer.font_family,
+            font_size: reg.font_size || layer.font_size,
+          };
+        }
+        return layer; // keep English if no regional text available
+      }
+      if (role.endsWith('_regional')) return null; // already merged above
+      return layer;
+    })
+    .filter(Boolean);
+
+  return { ...poster, layers: processed };
+}
+
+/** Check if the poster actually has any regional text in its layers */
+function hasRegionalContent(poster: PosterData): boolean {
+  return (poster.layers || []).some(
+    l => (l.role || '').endsWith('_regional') && l.text && l.text.trim() !== ''
+  );
+}
+
 interface VariantPreviewProps {
   variants: Record<string, PosterData>; // platform → poster_json
   secondaryLanguage?: string;
@@ -48,8 +105,10 @@ export default function VariantPreview({ variants, secondaryLanguage = 'telugu',
 
   const platforms = PLATFORM_ORDER.filter(p => variants[p]);
   const activePoster = variants[activePlatform];
+  const posterForView = activePoster ? getPosterForView(activePoster, langView) : null;
+  const regionalAvailable = activePoster ? hasRegionalContent(activePoster) : false;
 
-  if (!activePoster) {
+  if (!activePoster || !posterForView) {
     return <div className="text-gray-400 text-sm text-center py-8">No variants generated yet.</div>;
   }
 
@@ -75,7 +134,7 @@ export default function VariantPreview({ variants, secondaryLanguage = 'telugu',
       </div>
 
       {/* Language toggle */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <span className="text-sm text-gray-500">Preview language:</span>
         <LanguageToggle
           primaryLang="english"
@@ -83,13 +142,23 @@ export default function VariantPreview({ variants, secondaryLanguage = 'telugu',
           active={langView}
           onChange={setLangView}
         />
+        {langView === 'regional' && !regionalAvailable && (
+          <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+            ⚠ Regional translation unavailable — showing English
+          </span>
+        )}
+        {langView === 'regional' && regionalAvailable && (
+          <span className="text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+            ✓ Showing {secondaryLanguage} translation
+          </span>
+        )}
       </div>
 
       {/* Active poster */}
-      <div className="flex flex-wrap gap-6 items-start justify-center">
+      <div className="flex flex-wrap gap-6 items-start justify-center min-h-[420px]">
         <PosterRenderer
-          posterJson={activePoster}
-          scale={activePlatform === 'instagram_story' ? 0.28 : 0.38}
+          posterJson={posterForView}
+          scale={activePlatform === 'instagram_story' ? 0.29 : 0.40}
           showDownload
         />
 
