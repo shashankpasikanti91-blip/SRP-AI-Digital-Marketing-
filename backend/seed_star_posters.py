@@ -25,6 +25,11 @@ from app.models.tenant import Tenant
 from app.models.poster_variant import PosterVariant
 from app.models.social import SocialPost
 
+# Import related models so SQLAlchemy can resolve string-based relationships
+import app.models.brand_profile  # noqa - required for PosterVariant.brand_profile relationship
+import app.models.poster_template  # noqa - required for PosterVariant.template relationship
+import app.models.campaign  # noqa - required for PosterVariant FK
+
 engine = create_async_engine(settings.DATABASE_URL, echo=False)
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
