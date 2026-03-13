@@ -47,9 +47,16 @@ class ChatbotAgent:
     """Focused platform support chatbot using gpt-4o-mini."""
 
     def __init__(self):
-        from app.services.model_router import get_model_router, FeatureBucket
-        router = get_model_router()
-        self._client, self._model = router.resolve(FeatureBucket.chatbot)
+        # Lazy-init: don't resolve the API client at construction time so the
+        # app can start even when no API key is configured yet.
+        self._client = None
+        self._model: str | None = None
+
+    def _ensure_client(self) -> None:
+        """Resolve the AI client on first use (raises if key not configured)."""
+        if self._client is None:
+            from app.services.model_router import get_model_router, FeatureBucket
+            self._client, self._model = get_model_router().resolve(FeatureBucket.chatbot)
 
     async def chat(
         self,
@@ -81,6 +88,7 @@ class ChatbotAgent:
 
         messages.append({"role": "user", "content": user_message})
 
+        self._ensure_client()
         response = await self._client.chat.completions.create(
             model=self._model,
             messages=messages,
@@ -117,6 +125,7 @@ class ChatbotAgent:
 
         messages.append({"role": "user", "content": user_message})
 
+        self._ensure_client()
         stream = await self._client.chat.completions.create(
             model=self._model,
             messages=messages,
