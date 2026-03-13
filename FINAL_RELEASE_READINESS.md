@@ -34,6 +34,10 @@ All four issues identified were fixed before release.
 | 2 | `analytics_service.py`: Active campaigns counted `EmailCampaign` instead of `Campaign` | HIGH | `backend/app/services/analytics_service.py` | ✅ FIXED |
 | 3 | `PosterRenderer.tsx`: Download button showed raw JSON instead of rendered poster | HIGH | `frontend/src/components/poster/PosterRenderer.tsx` | ✅ FIXED |
 | 4 | `Dashboard.tsx`: Pipeline value was 1/100th due to double division by 100 | MEDIUM | `frontend/src/pages/Dashboard.tsx` | ✅ FIXED |
+| 5 | `CRM.tsx`: Hardcoded ₹ (INR) currency symbol in "New Deal" modal label | MEDIUM | `frontend/src/pages/CRM.tsx` | ✅ FIXED |
+| 6 | `Leads.tsx`: New Lead modal not scrollable — form fields cut off on small screens | MEDIUM | `frontend/src/pages/Leads.tsx` | ✅ FIXED |
+| 7 | `ContentGenerator.tsx`: Generator silently froze on API failure (no error shown) | HIGH | `frontend/src/pages/ContentGenerator.tsx` | ✅ FIXED |
+| 8 | `Campaigns.tsx`: AI Plan/Launch buttons failed silently with no user feedback | HIGH | `frontend/src/pages/Campaigns.tsx` | ✅ FIXED |
 
 ---
 

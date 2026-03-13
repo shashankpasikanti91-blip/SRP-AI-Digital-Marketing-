@@ -39,6 +39,9 @@ Full cross-check of all implemented phases across:
 | Landing Page | ✅ Working | Global USD pricing, 7 supported markets |
 | DB Migrations | ✅ Working | 8 sequential migrations |
 | AI Content | ✅ Working | OpenAI GPT-4o with proper fallbacks |
+| CRM Module | ✅ Fixed | Currency label fixed, modal scroll fixed |
+| Content Generator | ✅ Fixed | Error handling added — no longer freezes silently |
+| Campaigns Module | ✅ Fixed | AI Plan/Launch error handling, budget display improved |
 
 ---
 
@@ -67,6 +70,30 @@ Full cross-check of all implemented phases across:
 **Severity:** Medium — Pipeline value showed as 1/100th of actual value  
 **Root Cause:** `formatCurrency((ovw.total_pipeline_value ?? 0) / 100)` passed already-divided value to `formatCurrency()` which divides by 100 again internally  
 **Fix Applied:** Changed to `formatCurrency(ovw.total_pipeline_value ?? 0)` — correct single division inside the utility function.
+
+### BUG 5 — MEDIUM: CRM "New Deal" Modal Shows Hardcoded ₹ Currency
+**File:** `frontend/src/pages/CRM.tsx`  
+**Severity:** Medium — Hardcoded Indian Rupee symbol in "Value (₹)" label looks wrong for non-INR tenants  
+**Root Cause:** Label was hard-coded as `"Value (₹)"` in the New Deal form  
+**Fix Applied:** Changed to `"Deal Value"` — currency-agnostic, appropriate for all markets.
+
+### BUG 6 — MEDIUM: Leads Modal Cuts Off on Smaller Screens
+**File:** `frontend/src/pages/Leads.tsx`  
+**Severity:** Medium — New Lead modal was not scrollable; bottom fields unreachable on shorter viewports  
+**Root Cause:** Modal used `flex items-center justify-center` without `overflow-y-auto`, clipping the form on overflow  
+**Fix Applied:** Added `overflow-y-auto` to modal wrapper div; inner form uses `my-auto` for proper vertical centering while maintaining scroll capability.
+
+### BUG 7 — HIGH: Content Generator Silently Freezes on API Error
+**File:** `frontend/src/pages/ContentGenerator.tsx`  
+**Severity:** High — Button showed "Generating Content..." indefinitely if server returned 401 or 500; no error feedback  
+**Root Cause:** `finally` block reset `generating=false` but no `catch` captured the error; `genContent` remained `null` and no message was shown  
+**Fix Applied:** Added `genError` state + proper `try/catch` extracting error from Axios response. Shows red banner: "Generation failed: [message] — Tip: Check AI API key configuration on server."
+
+### BUG 8 — HIGH: Campaigns AI Plan/Launch Buttons Fail Silently
+**File:** `frontend/src/pages/Campaigns.tsx`  
+**Severity:** High — Clicking "AI Plan" or "Full Launch" produced no feedback if API call failed  
+**Root Cause:** `handlePlan()` and `handleFullLaunch()` had no error handling; `try` existed but `catch` was empty  
+**Fix Applied:** Added `planError` state + full `catch` with `axios.isAxiosError` check. Added dismissible red error banner in JSX above create modal. Also improved budget display: `null` budget now shows "Not set", and currency falls back to `'USD'` if unset.
 
 ---
 
@@ -259,6 +286,11 @@ Full cross-check of all implemented phases across:
 | `backend/app/services/analytics_service.py` | Fixed active_campaigns to count from Campaign table |
 | `frontend/src/components/poster/PosterRenderer.tsx` | Implemented proper download with print-to-PDF poster preview |
 | `frontend/src/pages/Dashboard.tsx` | Fixed pipeline value double-division bug |
+| `frontend/src/pages/CRM.tsx` | Removed hardcoded ₹ currency from Deal Value label |
+| `frontend/src/pages/Leads.tsx` | Fixed modal overflow — scroll now works on all screen sizes |
+| `frontend/src/pages/ContentGenerator.tsx` | Added genError state, try/catch, error display banner |
+| `frontend/src/pages/Campaigns.tsx` | Added planError state, error handling for AI Plan/Launch, budget display fix |
+| `backend/seed_star_posters.py` | Pre-generated 4 poster variants + 5 WhatsApp statuses for bunty demo account |
 
 ---
 

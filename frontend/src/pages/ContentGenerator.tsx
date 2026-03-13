@@ -57,6 +57,7 @@ export function ContentGeneratorPage() {
     language: 'English',
   })
   const [generating, setGenerating] = useState(false)
+  const [genError, setGenError] = useState<string | null>(null)
   type GeneratedResult = {
     headline?: string
     primary_copy?: string
@@ -74,10 +75,16 @@ export function ContentGeneratorPage() {
   async function handleGenerate() {
     if (!form.topic) return
     setGenerating(true)
+    setGenError(null)
     try {
       const res = await contentApi.generate(form)
       setResult(res.content)
       qc.invalidateQueries({ queryKey: ['content'] })
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+        ?? (err as Error)?.message
+        ?? 'Content generation failed. Please try again.'
+      setGenError(msg)
     } finally {
       setGenerating(false)
     }
@@ -196,6 +203,17 @@ export function ContentGeneratorPage() {
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             {generating ? 'Generating Content...' : 'Generate Content'}
           </button>
+
+          {genError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-start gap-2">
+              <span className="text-red-500 mt-0.5">⚠</span>
+              <div>
+                <p className="font-medium">Generation failed</p>
+                <p className="text-xs mt-0.5 text-red-600">{genError}</p>
+                <p className="text-xs mt-1 text-red-500">Tip: Check AI API key configuration on server.</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Result Panel */}

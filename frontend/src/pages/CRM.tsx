@@ -166,11 +166,11 @@ export function CRMPage() {
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Value (₹)</label>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">Deal Value</label>
                 <input
                   type="number"
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  placeholder="0"
+                  placeholder="e.g. 5000"
                   value={dealForm.value}
                   onChange={e => setDealForm(f => ({ ...f, value: e.target.value }))}
                 />

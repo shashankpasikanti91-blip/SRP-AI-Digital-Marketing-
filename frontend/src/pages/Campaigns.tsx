@@ -41,7 +41,7 @@ function CampaignCard({ campaign, onPlan }: { campaign: Campaign; onPlan: (id: s
       </div>
 
       <div className="flex items-center justify-between text-xs text-gray-500">
-        <span>Budget: {campaign.currency} {(campaign.budget_total / 100).toLocaleString()}</span>
+        <span>Budget: {campaign.budget_total > 0 ? `${campaign.currency ?? 'USD'} ${Math.round(campaign.budget_total / 100).toLocaleString()}` : 'Not set'}</span>
         <span>{campaign.duration_weeks}w campaign</span>
       </div>
 
@@ -83,6 +83,7 @@ export function CampaignsPage() {
   const [launchForm, setLaunchForm] = useState({ campaign_goal: '', budget: 1000, duration_weeks: 4, target_audience: 'General audience' })
   const [planLoading, setPlanLoading] = useState<string | null>(null)
   const [launchLoading, setLaunchLoading] = useState(false)
+  const [planError, setPlanError] = useState<string | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['campaigns'],
@@ -96,10 +97,15 @@ export function CampaignsPage() {
 
   async function handlePlan(id: string) {
     setPlanLoading(id)
+    setPlanError(null)
     try {
       const res = await campaignsApi.generatePlan(id)
       qc.invalidateQueries({ queryKey: ['campaigns'] })
       setPlanResult(res)
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+        ?? (err as Error)?.message ?? 'AI plan generation failed'
+      setPlanError(msg)
     } finally {
       setPlanLoading(null)
     }
@@ -107,11 +113,16 @@ export function CampaignsPage() {
 
   async function handleFullLaunch() {
     setLaunchLoading(true)
+    setPlanError(null)
     try {
       const res = await campaignsApi.launchWorkflow(launchForm)
       qc.invalidateQueries({ queryKey: ['campaigns'] })
       setPlanResult(res)
       setShowLaunch(false)
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+        ?? (err as Error)?.message ?? 'AI launch failed'
+      setPlanError(msg)
     } finally {
       setLaunchLoading(false)
     }
@@ -139,6 +150,15 @@ export function CampaignsPage() {
           </button>
         </div>
       </div>
+
+      {/* Error Banner */}
+      {planError && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-center gap-2">
+          <span>⚠</span>
+          <span>{planError}</span>
+          <button className="ml-auto text-red-400 hover:text-red-600" onClick={() => setPlanError(null)}>×</button>
+        </div>
+      )}
 
       {/* Create Campaign Modal */}
       {showCreate && (

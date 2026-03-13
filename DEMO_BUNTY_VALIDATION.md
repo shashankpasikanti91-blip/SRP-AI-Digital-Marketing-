@@ -238,6 +238,12 @@
 | Active campaigns showed 0 (same fix) | HIGH | ✅ Fixed (same service layer) |
 | Pipeline value was 100x too small (same fix) | MEDIUM | ✅ Fixed (same utility) |
 | No healthcare-specific SEO prompts | LOW | Noted (general SEO AI still works) |
+| CRM "New Deal" modal showed "Value (₹)" label | MEDIUM | ✅ Fixed — now shows "Deal Value" |
+| Leads modal cut off — scroll not working | MEDIUM | ✅ Fixed — overflow-y-auto added |
+| Content Generator froze silently on AI failure | HIGH | ✅ Fixed — error banner added |
+| Campaigns AI Plan/Launch had no error feedback | HIGH | ✅ Fixed — error state + banner added |
+| No poster variants in gallery (empty state) | MEDIUM | ✅ Fixed — seed_star_posters.py adds 4 variants |
+| No WhatsApp status posts (empty state) | MEDIUM | ✅ Fixed — seed_star_posters.py adds 5 WhatsApp posts |
 
 ---
 
@@ -261,6 +267,10 @@ Before presenting to a client, the following must be manually verified by the de
 - [ ] Login works
 - [ ] Dashboard shows healthcare data (leads, 2 active campaigns)
 - [ ] Go to Campaign Builder → select Healthcare template → generate poster
-- [ ] Go to Poster Gallery → verify poster was saved correctly → download works
+- [ ] Go to **Poster Gallery** → verify 4 pre-seeded posters visible (Orthopedic ₹500 x2, Diabetes, General Health)
+- [ ] Download any poster → opens full-res 1080×1080 print window
+- [ ] Go to **WhatsApp Status** → verify 5 pre-seeded status posts visible (published/scheduled/draft)
+- [ ] Go to **CRM** → New Deal → confirm label says "Deal Value" (not "Value (₹)")
+- [ ] Go to **Leads** → New Lead → confirm modal is scrollable
 - [ ] Go to Analytics → confirm healthcare campaign data loads
 - [ ] Logout
