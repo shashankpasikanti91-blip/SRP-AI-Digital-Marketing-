@@ -317,6 +317,126 @@ function renderDivider(layer: PosterLayer, idx: number) {
   );
 }
 
+/**
+ * Decorative geometric shapes — circles, diagonals, rectangles.
+ * Absolutely positioned so they don't affect flow layout.
+ */
+function renderShapes(layer: PosterLayer, idx: number) {
+  const shapes = (layer as any).shapes as Array<any> || [];
+  return (
+    <div
+      key={idx}
+      className="absolute inset-0 pointer-events-none overflow-hidden"
+      style={{ zIndex: 1 }}
+    >
+      {shapes.map((shape: any, i: number) => {
+        const base: React.CSSProperties = {
+          position: 'absolute',
+          background: shape.color || 'rgba(255,255,255,0.07)',
+          ...(shape.x !== undefined    ? { left: shape.x }    : {}),
+          ...(shape.right !== undefined ? { right: shape.right } : {}),
+          ...(shape.y !== undefined    ? { top: shape.y }     : {}),
+          ...(shape.bottom !== undefined ? { bottom: shape.bottom } : {}),
+        };
+        if (shape.type === 'circle') {
+          return (
+            <div key={i} style={{
+              ...base,
+              width: shape.size,
+              height: shape.size,
+              borderRadius: '50%',
+              border: shape.border ? `${shape.border_width || 3}px solid ${shape.border_color || 'rgba(255,255,255,0.15)'}` : undefined,
+              background: shape.border ? 'transparent' : base.background,
+            }} />
+          );
+        }
+        if (shape.type === 'rect' || shape.type === 'diagonal') {
+          return (
+            <div key={i} style={{
+              ...base,
+              width: shape.w || shape.width || 200,
+              height: shape.h || shape.height || 200,
+              transform: `rotate(${shape.rotate || 0}deg)`,
+              borderRadius: shape.radius || 0,
+            }} />
+          );
+        }
+        return null;
+      })}
+    </div>
+  );
+}
+
+/**
+ * Service / feature grid — displays items as attractive color-backed tiles.
+ * Used for agency, business, and hospital service posters.
+ */
+function renderServiceGrid(layer: PosterLayer, idx: number) {
+  const raw = layer as any;
+  const items: string[] = raw.items || [];
+  if (items.length === 0) return null;
+  const cols: number = raw.columns || 3;
+  const itemBg: string = raw.item_bg || 'rgba(255,255,255,0.13)';
+  const textColor: string = layer.styling?.color || '#FFFFFF';
+  const iconColor: string = raw.icon_color || '#F59E0B';
+  const icon: string = raw.icon || '◆';
+  const fSize: number = Number(layer.styling?.fontSize ?? 18);
+  return (
+    <div key={idx} className="relative w-full px-2 py-1" style={{ zIndex: 2 }}>
+      <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+        {items.map((item, i) => (
+          <div
+            key={i}
+            className="flex flex-col items-center justify-center text-center rounded-xl px-1 py-2"
+            style={{
+              background: itemBg,
+              color: textColor,
+              fontSize: fSize,
+              lineHeight: 1.25,
+              minHeight: fSize * 3.5,
+            }}
+          >
+            <span style={{ color: iconColor, fontSize: fSize * 1.35, lineHeight: 1.2 }}>{icon}</span>
+            <span style={{ fontWeight: 700, marginTop: 2, fontSize: fSize * 0.88 }}>{item}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Stat row — displays 3 stats (value + label) horizontally.
+ * Common in agency/business posters: "500+ Clients  •  1200+ Projects  •  98% Success"
+ */
+function renderStatRow(layer: PosterLayer, idx: number) {
+  const raw = layer as any;
+  const items: Array<{ value: string; label: string }> = raw.items || [];
+  if (items.length === 0) return null;
+  const textColor: string = layer.styling?.color || 'rgba(255,255,255,0.7)';
+  const valueColor: string = raw.value_color || '#F59E0B';
+  const fSize: number = Number(layer.styling?.fontSize ?? 20);
+  const divColor: string = raw.divider_color || 'rgba(255,255,255,0.2)';
+  return (
+    <div key={idx} className="relative w-full px-3 py-2" style={{ zIndex: 2 }}>
+      <div
+        className="rounded-2xl flex justify-around items-center py-3"
+        style={{ background: raw.bg || 'rgba(0,0,0,0.25)' }}
+      >
+        {items.map((item, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && <div style={{ width: 1, height: fSize * 2, background: divColor }} />}
+            <div className="flex flex-col items-center text-center px-2">
+              <span style={{ color: valueColor, fontSize: fSize * 1.7, fontWeight: 800, lineHeight: 1.1 }}>{item.value}</span>
+              <span style={{ color: textColor, fontSize: fSize * 0.8, lineHeight: 1.4 }}>{item.label}</span>
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function renderLayer(layer: PosterLayer, idx: number): React.ReactNode {
   switch (layer.type) {
     case 'background': return renderBackground(layer, idx);
@@ -328,6 +448,9 @@ function renderLayer(layer: PosterLayer, idx: number): React.ReactNode {
     case 'cta_button': return renderCtaButton(layer, idx);
     case 'footer': return renderFooter(layer, idx);
     case 'divider': return renderDivider(layer, idx);
+    case 'shapes': return renderShapes(layer, idx);
+    case 'service_grid': return renderServiceGrid(layer, idx);
+    case 'stat_row': return renderStatRow(layer, idx);
     default: return null;
   }
 }

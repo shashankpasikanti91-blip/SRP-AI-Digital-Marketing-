@@ -65,3 +65,11 @@ nginx/ssl/*.p12
 
 # Alembic auto-generated (keep versions)
 alembic/versions/*.pyc
+
+# Deployment/server tools with credentials
+tools/
+docs/
+
+# Server deployment tools (may contain credentials - do not commit)
+tools/
+docs/

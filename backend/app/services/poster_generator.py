@@ -318,6 +318,186 @@ SYSTEM_TEMPLATES: dict[str, dict] = {
         "cta": {"x": 40, "y": 900, "w": 1000, "h": 72, "bg": "#FED7AA", "text_color": "#000", "font_size": 32, "bold": True, "border_radius": 12},
         "footer": {"x": 0, "y": 1000, "w": 1080, "h": 80, "bg": "#431407", "text_color": "#FFFFFF", "font_size": 20},
     },
+
+    # ════════════════════════════════════════════════════════════════════
+    # PREMIUM AGENCY / BUSINESS TEMPLATES  (with shapes + service_grid)
+    # ════════════════════════════════════════════════════════════════════
+
+    "digital_agency_promo": {
+        # Deep navy background with decorative circles + service grid layout
+        # Looks like professional Canva/Freepik agency posters
+        "background": {"type": "gradient", "colors": ["#0F172A", "#1E293B"], "direction": "180deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 500, "x": -160, "y": -160,
+                 "color": "rgba(99,102,241,0.10)"},
+                {"type": "circle", "size": 350, "right": -100, "y": 300,
+                 "color": "rgba(245,158,11,0.08)"},
+                {"type": "circle", "size": 240, "right": -60, "bottom": -60,
+                 "border": True, "border_color": "rgba(245,158,11,0.20)", "border_width": 4},
+                {"type": "rect", "w": 120, "h": 600, "right": 0, "y": 0,
+                 "color": "rgba(245,158,11,0.12)", "rotate": 0, "radius": 0},
+                {"type": "rect", "w": 1080, "h": 6, "x": 0, "y": 0,
+                 "color": "#F59E0B", "rotate": 0},
+            ]
+        },
+        "badge": {"x": 300, "y": 80, "type": "pill", "bg": "#F59E0B", "text_color": "#0F172A", "font_size": 24, "bold": True},
+        "title": {"x": 40, "y": 160, "w": 900, "font_size": 62, "bold": True, "color": "#FFFFFF", "align": "center"},
+        "regional_title": {"x": 40, "y": 240, "w": 900, "font_size": 42, "bold": True, "color": "#F59E0B", "align": "center"},
+        "subtitle": {"x": 40, "y": 310, "w": 1000, "font_size": 26, "color": "#CBD5E1", "align": "center"},
+        "regional_subtitle": {"x": 40, "y": 350, "w": 1000, "font_size": 22, "color": "#94A3B8", "align": "center"},
+        # Service grid instead of checklist
+        "service_grid": {"columns": 3, "icon": "◆", "icon_color": "#F59E0B",
+                         "item_bg": "rgba(255,255,255,0.08)", "font_size": 21},
+        # Stats bar: clients, projects, success
+        "stat_block": {
+            "items": [
+                {"value": "500+", "label": "Clients Served"},
+                {"value": "1200+", "label": "Campaigns"},
+                {"value": "98%", "label": "Success Rate"},
+            ],
+            "font_size": 22, "value_color": "#F59E0B",
+            "bg": "rgba(245,158,11,0.10)",
+            "divider_color": "rgba(245,158,11,0.30)",
+        },
+        "cta": {"x": 40, "y": 900, "w": 1000, "h": 72, "bg": "#F59E0B", "text_color": "#0F172A", "font_size": 30, "bold": True, "border_radius": 16},
+        "footer": {"x": 0, "y": 1005, "w": 1080, "h": 75, "bg": "#020617", "text_color": "#FFFFFF", "font_size": 20},
+    },
+
+    "business_services_pro": {
+        # Dark purple-to-slate with decorative geometry + service grid
+        "background": {"type": "gradient", "colors": ["#1E1B4B", "#312E81"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 420, "right": -120, "y": -100,
+                 "color": "rgba(167,139,250,0.10)"},
+                {"type": "circle", "size": 280, "x": -80, "bottom": 200,
+                 "color": "rgba(167,139,250,0.07)"},
+                {"type": "circle", "size": 180, "x": 80, "bottom": 80,
+                 "border": True, "border_color": "rgba(167,139,250,0.25)", "border_width": 3},
+                {"type": "rect", "w": 1080, "h": 8, "x": 0, "y": 0,
+                 "color": "#A78BFA", "rotate": 0},
+                {"type": "rect", "w": 300, "h": 300, "right": 60, "bottom": 200,
+                 "color": "rgba(167,139,250,0.05)", "rotate": 45, "radius": 24},
+            ]
+        },
+        "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
+        "badge": {"x": 360, "y": 130, "type": "pill", "bg": "#A78BFA", "text_color": "#1E1B4B", "font_size": 24, "bold": True},
+        "title": {"x": 40, "y": 210, "w": 1000, "font_size": 58, "bold": True, "color": "#FFFFFF", "align": "center"},
+        "regional_title": {"x": 40, "y": 285, "w": 1000, "font_size": 40, "bold": True, "color": "#C4B5FD", "align": "center"},
+        "subtitle": {"x": 40, "y": 345, "w": 1000, "font_size": 26, "color": "#DDD6FE", "align": "center"},
+        "regional_subtitle": {"x": 40, "y": 385, "w": 1000, "font_size": 22, "color": "#C4B5FD", "align": "center"},
+        "service_grid": {"columns": 2, "icon": "✦", "icon_color": "#A78BFA",
+                         "item_bg": "rgba(255,255,255,0.09)", "font_size": 22},
+        "cta": {"x": 40, "y": 900, "w": 1000, "h": 72, "bg": "#A78BFA", "text_color": "#1E1B4B", "font_size": 30, "bold": True, "border_radius": 16},
+        "footer": {"x": 0, "y": 1005, "w": 1080, "h": 75, "bg": "#0F0A2E", "text_color": "#FFFFFF", "font_size": 20},
+    },
+
+    "agency_hero_bold": {
+        # Black + vibrant yellow — bold two-tone agency hero (like Freepik DM agency posters)
+        "background": {"type": "gradient", "colors": ["#111827", "#1F2937"], "direction": "180deg"},
+        "shapes": {
+            "shapes": [
+                # Top-right filled circle — "we are digital marketing" style
+                {"type": "circle", "size": 340, "right": -80, "y": -80,
+                 "color": "rgba(234,179,8,0.15)"},
+                # Bottom-left outline circle
+                {"type": "circle", "size": 260, "x": -60, "bottom": 150,
+                 "border": True, "border_color": "rgba(234,179,8,0.25)", "border_width": 3},
+                # Top accent bar
+                {"type": "rect", "w": 1080, "h": 8, "x": 0, "y": 0,
+                 "color": "#EAB308", "rotate": 0},
+                # Diagonal accent slab bottom-right
+                {"type": "rect", "w": 400, "h": 400, "right": -150, "bottom": -150,
+                 "color": "rgba(234,179,8,0.07)", "rotate": 30, "radius": 0},
+            ]
+        },
+        "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
+        "badge": {"x": 340, "y": 128, "type": "pill", "bg": "#EAB308", "text_color": "#111827", "font_size": 26, "bold": True},
+        "title": {"x": 40, "y": 205, "w": 1000, "font_size": 64, "bold": True, "color": "#FFFFFF", "align": "center"},
+        "regional_title": {"x": 40, "y": 285, "w": 1000, "font_size": 44, "bold": True, "color": "#FDE047", "align": "center"},
+        "subtitle": {"x": 40, "y": 350, "w": 1000, "font_size": 27, "color": "#9CA3AF", "align": "center"},
+        "regional_subtitle": {"x": 40, "y": 390, "w": 1000, "font_size": 22, "color": "#6B7280", "align": "center"},
+        "service_grid": {"columns": 3, "icon": "→",
+                         "icon_color": "#EAB308",
+                         "item_bg": "rgba(234,179,8,0.12)", "font_size": 20},
+        "stat_block": {
+            "items": [
+                {"value": "10+", "label": "Years Experience"},
+                {"value": "800+", "label": "Happy Clients"},
+                {"value": "24/7", "label": "Support"},
+            ],
+            "font_size": 22,
+            "value_color": "#EAB308",
+            "bg": "rgba(234,179,8,0.10)",
+            "divider_color": "rgba(234,179,8,0.30)",
+        },
+        "cta": {"x": 40, "y": 898, "w": 1000, "h": 74, "bg": "#EAB308", "text_color": "#111827", "font_size": 30, "bold": True, "border_radius": 16},
+        "footer": {"x": 0, "y": 1005, "w": 1080, "h": 75, "bg": "#030712", "text_color": "#FFFFFF", "font_size": 20},
+    },
+
+    "hospital_premium": {
+        # Clean white-on-blue hospital / healthcare with decorative circles
+        "background": {"type": "gradient", "colors": ["#0C4A6E", "#0369A1"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 460, "right": -130, "y": -130,
+                 "color": "rgba(186,230,253,0.08)"},
+                {"type": "circle", "size": 300, "x": -80, "bottom": 200,
+                 "border": True, "border_color": "rgba(186,230,253,0.18)", "border_width": 3},
+                {"type": "rect", "w": 1080, "h": 8, "x": 0, "y": 0,
+                 "color": "#38BDF8", "rotate": 0},
+                {"type": "circle", "size": 140, "right": 100, "bottom": 280,
+                 "color": "rgba(56,189,248,0.08)"},
+            ]
+        },
+        "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
+        "accreditation": {"position": "top-right", "x": 900, "y": 40, "w": 100, "h": 50},
+        "badge": {"x": 380, "y": 130, "type": "pill", "bg": "#38BDF8", "text_color": "#0C4A6E", "font_size": 26, "bold": True},
+        "title": {"x": 40, "y": 215, "w": 1000, "font_size": 56, "bold": True, "color": "#FFFFFF", "align": "center"},
+        "regional_title": {"x": 40, "y": 290, "w": 1000, "font_size": 38, "bold": True, "color": "#BAE6FD", "align": "center"},
+        "subtitle": {"x": 40, "y": 350, "w": 1000, "font_size": 26, "color": "#E0F2FE", "align": "center"},
+        "regional_subtitle": {"x": 40, "y": 390, "w": 1000, "font_size": 22, "color": "#BAE6FD", "align": "center"},
+        "doctor_block": {"x": 60, "y": 430, "font_size": 24, "color": "#7DD3FC", "bold": True},
+        "service_grid": {"columns": 3, "icon": "✚", "icon_color": "#38BDF8",
+                         "item_bg": "rgba(255,255,255,0.10)", "font_size": 20},
+        "price_block": {"x": 40, "y": 730, "font_size": 70, "color": "#38BDF8", "bold": True, "align": "center"},
+        "original_price": {"x": 40, "y": 815, "font_size": 28, "color": "#9CA3AF", "strikethrough": True, "align": "center"},
+        "date_block": {"x": 40, "y": 860, "font_size": 26, "color": "#FFFFFF", "bold": True, "align": "center"},
+        "cta": {"x": 40, "y": 918, "w": 1000, "h": 72, "bg": "#38BDF8", "text_color": "#0C4A6E", "font_size": 30, "bold": True, "border_radius": 16},
+        "footer": {"x": 0, "y": 1005, "w": 1080, "h": 75, "bg": "#082040", "text_color": "#FFFFFF", "font_size": 20},
+    },
+
+    "real_estate_luxury": {
+        # Deep slate + gold — luxury property / real estate
+        "background": {"type": "gradient", "colors": ["#1C1917", "#292524"], "direction": "180deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "rect", "w": 1080, "h": 8, "x": 0, "y": 0,
+                 "color": "#D97706", "rotate": 0},
+                {"type": "rect", "w": 8, "h": 1080, "x": 0, "y": 0,
+                 "color": "#D97706", "rotate": 0},
+                {"type": "circle", "size": 400, "right": -100, "y": -100,
+                 "color": "rgba(217,119,6,0.07)"},
+                {"type": "rect", "w": 300, "h": 300, "right": 40, "bottom": 340,
+                 "color": "rgba(217,119,6,0.07)", "rotate": 45},
+                {"type": "circle", "size": 200, "x": -60, "bottom": 300,
+                 "border": True, "border_color": "rgba(217,119,6,0.20)", "border_width": 2},
+            ]
+        },
+        "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
+        "badge": {"x": 360, "y": 130, "type": "pill", "bg": "#D97706", "text_color": "#FFF", "font_size": 26, "bold": True},
+        "title": {"x": 40, "y": 215, "w": 1000, "font_size": 62, "bold": True, "color": "#FFFFFF", "align": "center"},
+        "regional_title": {"x": 40, "y": 295, "w": 1000, "font_size": 42, "bold": True, "color": "#FCD34D", "align": "center"},
+        "subtitle": {"x": 40, "y": 360, "w": 1000, "font_size": 26, "color": "#D6D3D1", "align": "center"},
+        "regional_subtitle": {"x": 40, "y": 400, "w": 1000, "font_size": 22, "color": "#A8A29E", "align": "center"},
+        "checklist": {"x": 60, "y": 460, "font_size": 24, "icon": "◈", "icon_color": "#D97706", "color": "#FFFFFF", "columns": 2, "line_height": 48},
+        "price_block": {"x": 40, "y": 720, "font_size": 72, "color": "#D97706", "bold": True, "align": "center"},
+        "original_price": {"x": 40, "y": 810, "font_size": 28, "color": "#78716C", "strikethrough": True, "align": "center"},
+        "date_block": {"x": 40, "y": 860, "font_size": 26, "color": "#FCD34D", "bold": True, "align": "center"},
+        "cta": {"x": 40, "y": 918, "w": 1000, "h": 72, "bg": "#D97706", "text_color": "#FFF", "font_size": 30, "bold": True, "border_radius": 16},
+        "footer": {"x": 0, "y": 1005, "w": 1080, "h": 75, "bg": "#0C0A09", "text_color": "#FFFFFF", "font_size": 20},
+    },
 }
 
 # Map slugs that share a layout with an existing template
@@ -333,6 +513,15 @@ SLUG_LAYOUT_MAP: dict[str, str] = {
     "automobile_service":  "retail_discount",
     "travel_tour":         "event_announcement",
     "furniture_sale":      "retail_discount",
+    # new agency / business mapping
+    "digital_marketing":   "digital_agency_promo",
+    "content_marketing":   "digital_agency_promo",
+    "social_media_agency": "digital_agency_promo",
+    "seo_agency":          "digital_agency_promo",
+    "web_design":          "business_services_pro",
+    "it_services":         "business_services_pro",
+    "consulting":          "business_services_pro",
+    "law_firm":            "business_services_pro",
 }
 
 
@@ -421,6 +610,28 @@ class PosterGenerator:
                 "w": w,
                 "h": int(strip["height"] * scale_y),
                 "fill": accent if brand else strip["color"],
+            })
+
+        # Decorative shapes overlay (circles, diagonals) — new premium templates
+        if "shapes" in layout:
+            shapes_def = layout["shapes"]
+            # Scale shape positions relative to 1080×1080 base
+            scaled_shapes = []
+            for sh in shapes_def.get("shapes", []):
+                s = dict(sh)
+                for key in ("size", "w", "h", "width", "height"):
+                    if key in s:
+                        s[key] = int(s[key] * scale_x)
+                for key in ("x", "right"):
+                    if key in s:
+                        s[key] = int(s[key] * scale_x)
+                for key in ("y", "bottom"):
+                    if key in s:
+                        s[key] = int(s[key] * scale_y)
+                scaled_shapes.append(s)
+            layers.append({
+                "type": "shapes",
+                "shapes": scaled_shapes,
             })
 
         # Logo
@@ -547,6 +758,44 @@ class PosterGenerator:
                 "color": db_.get("color", "#FCD34D"),
                 "bold": db_.get("bold", False),
                 "font_family": font,
+            })
+
+        # Service grid (premium agency/business templates)
+        # Used instead of or in addition to the checklist
+        if "service_grid" in layout and bilingual.english_services:
+            sg = layout["service_grid"]
+            items_en = bilingual.english_services[:6]
+            items_reg = bilingual.regional_services[:6] if bilingual.regional_services else []
+            combined = []
+            for i, en in enumerate(items_en):
+                if i < len(items_reg) and items_reg[i] and items_reg[i] != en:
+                    combined.append(f"{en}")  # keep English only in grid for readability
+                else:
+                    combined.append(en)
+            layers.append({
+                "type": "service_grid",
+                "role": "services_grid",
+                "items": combined,
+                "columns": sg.get("columns", 3),
+                "icon": sg.get("icon", "◆"),
+                "icon_color": accent if brand else sg.get("icon_color", "#F59E0B"),
+                "item_bg": sg.get("item_bg", "rgba(255,255,255,0.10)"),
+                "color": secondary if brand else "#FFFFFF",
+                "font_size": int(sg.get("font_size", 21) * scale_x),
+            })
+
+        # Stat row (agencies + business service posters)
+        if "stat_block" in layout:
+            sb2 = layout["stat_block"]
+            layers.append({
+                "type": "stat_row",
+                "role": "stats",
+                "items": sb2.get("items", []),
+                "font_size": int(sb2.get("font_size", 22) * scale_x),
+                "value_color": accent if brand else sb2.get("value_color", "#F59E0B"),
+                "color": secondary if brand else "rgba(255,255,255,0.7)",
+                "bg": sb2.get("bg", "rgba(0,0,0,0.20)"),
+                "divider_color": sb2.get("divider_color", "rgba(255,255,255,0.2)"),
             })
 
         # Checklist / services
