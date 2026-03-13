@@ -259,17 +259,28 @@ function renderChecklist(layer: PosterLayer, idx: number) {
 
 function renderCtaButton(layer: PosterLayer, idx: number) {
   if (!layer.text || layer.text.trim() === '') return null;
+  const raw = layer as any;
+  const bg = layer.styling?.backgroundColor || '#F59E0B';
+  const color = layer.styling?.color || '#1a1a1a';
+  const fontSize = layer.styling?.fontSize || 28;
+  const borderRadius = raw.border_radius || raw.styling?.borderRadius || 12;
+  const w = raw.w || raw.width;
+  const h = raw.h || raw.height || 64;
   return (
-    <div key={idx} className="relative flex justify-center mt-1" style={{ zIndex: 2 }}>
+    <div key={idx} className="relative flex justify-center mt-2" style={{ zIndex: 2, width: '100%' }}>
       <div
-        className="px-5 py-2 rounded-full font-bold text-center"
+        className="font-bold text-center flex items-center justify-center"
         style={{
-          background: layer.styling?.backgroundColor || '#F59E0B',
-          color: layer.styling?.color || '#1a1a1a',
-          fontSize: layer.styling?.fontSize || 13,
+          background: bg,
+          color,
+          fontSize,
           fontWeight: '800',
-          letterSpacing: '0.02em',
-          ...(layer.styling as React.CSSProperties || {}),
+          borderRadius,
+          height: h,
+          width: w || '100%',
+          letterSpacing: '0.01em',
+          padding: '0 24px',
+          boxShadow: `0 4px 16px ${bg}66`,
         }}
       >
         {layer.text}

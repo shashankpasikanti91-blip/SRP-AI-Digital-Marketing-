@@ -122,6 +122,45 @@ MODELS: dict[str, ModelDef] = {
         max_tokens=8192,
         supports_json=True,
     ),
+    # ── Image generation via OpenRouter ─────────────────────────────────────
+    # FLUX.1-schnell: ultra-cheap (~$0.003/img), good for drafts/testing
+    "openrouter/flux/flux-1-schnell": ModelDef(
+        model_id="black-forest-labs/flux-1-schnell",   # exact OpenRouter model ID
+        provider=PROVIDER_OPENROUTER,
+        input_cost_per_1k=0.0000,    # billed per image, not tokens
+        output_cost_per_1k=0.0030,   # ~$0.003 per image
+        max_tokens=512,
+        supports_json=False,
+    ),
+    # FLUX.1.1-pro: high quality (~$0.04/img), crisp photorealistic output
+    "openrouter/flux/flux-1-1-pro": ModelDef(
+        model_id="black-forest-labs/flux-1.1-pro",     # exact OpenRouter model ID
+        provider=PROVIDER_OPENROUTER,
+        input_cost_per_1k=0.0000,
+        output_cost_per_1k=0.0400,   # ~$0.04 per image — higher quality
+        max_tokens=512,
+        supports_json=False,
+    ),
+    # FLUX.1-pro: balanced quality/cost (~$0.055/img)
+    "openrouter/flux/flux-1-pro": ModelDef(
+        model_id="black-forest-labs/flux-1-pro",       # exact OpenRouter model ID
+        provider=PROVIDER_OPENROUTER,
+        input_cost_per_1k=0.0000,
+        output_cost_per_1k=0.0550,   # ~$0.055 per image
+        max_tokens=512,
+        supports_json=False,
+    ),
+    # ── Text models — OpenRouter ──────────────────────────────────────────────
+    # GPT-4.1-mini: newest cheapest OpenAI quality text model (Apr 2025)
+    # $0.40/1M input, $1.60/1M output — better quality than gpt-4o-mini
+    "openrouter/openai/gpt-4.1-mini": ModelDef(
+        model_id="openai/gpt-4.1-mini",
+        provider=PROVIDER_OPENROUTER,
+        input_cost_per_1k=0.0004,
+        output_cost_per_1k=0.0016,
+        max_tokens=32768,
+        supports_json=True,
+    ),
     "openrouter/openai/gpt-4o-mini": ModelDef(
         model_id="openai/gpt-4o-mini",
         provider=PROVIDER_OPENROUTER,
@@ -155,6 +194,15 @@ MODELS: dict[str, ModelDef] = {
         supports_json=True,
     ),
     # ── OpenAI Direct ───────────────────────────────────────────────────
+    # GPT-4.1-mini direct: best quality-per-dollar text model (Apr 2025)
+    "openai/gpt-4.1-mini": ModelDef(
+        model_id="gpt-4.1-mini",
+        provider=PROVIDER_OPENAI,
+        input_cost_per_1k=0.0004,
+        output_cost_per_1k=0.0016,
+        max_tokens=32768,
+        supports_json=True,
+    ),
     "openai/gpt-4o-mini": ModelDef(
         model_id="gpt-4o-mini",
         provider=PROVIDER_OPENAI,
@@ -181,51 +229,59 @@ MODELS: dict[str, ModelDef] = {
 # Fallback = better model if primary fails
 BUCKET_MODEL_MAP: dict[FeatureBucket, tuple[str, str]] = {
     # Primary = cheapest/best OpenRouter model
-    # Fallback = OpenAI direct (ensures translation works even if OpenRouter key fails)
+    # Fallback = OpenAI direct (ensures tasks work even if OpenRouter key is missing)
+    #
+    # Text tiers:
+    #   text_basic/seo     → gemini-flash-1.5 (near-free)   fallback: gpt-4.1-mini
+    #   text_marketing     → gpt-4.1-mini via OpenRouter     fallback: gpt-4.1-mini direct
+    #   translation        → gpt-4.1-mini direct (best multilingual accuracy)
+    #   campaign_strategy  → gpt-4o for reasoning depth      fallback: gpt-4.1-mini
+    #   chatbot            → claude-3-haiku (fast, cheap)    fallback: gpt-4.1-mini
+    # Image tiers:
+    #   image_generation   → FLUX.1-schnell ($0.003)         fallback: FLUX.1.1-pro ($0.04)
     FeatureBucket.text_basic: (
-        "openrouter/google/gemini-flash-1.5",
-        "openai/gpt-4o-mini",           # Direct OpenAI fallback
+        "openrouter/google/gemini-flash-1.5",       # near-free
+        "openai/gpt-4.1-mini",                      # direct OpenAI fallback
     ),
     FeatureBucket.text_marketing: (
-        "openrouter/openai/gpt-4o-mini",
-        "openai/gpt-4o-mini",           # Direct OpenAI fallback
+        "openrouter/openai/gpt-4.1-mini",           # quality marketing copy
+        "openai/gpt-4.1-mini",                      # direct OpenAI fallback
     ),
     FeatureBucket.translation: (
-        "openai/gpt-4o-mini",           # OpenAI direct as PRIMARY (most reliable for multilingual)
-        "openrouter/google/gemini-flash-1.5",  # OpenRouter as secondary
+        "openai/gpt-4.1-mini",                      # OpenAI direct PRIMARY — best multilingual
+        "openrouter/openai/gpt-4.1-mini",           # OpenRouter secondary
     ),
     FeatureBucket.localization: (
-        "openai/gpt-4o-mini",           # OpenAI direct as PRIMARY for locale accuracy
-        "openrouter/openai/gpt-4o-mini",
+        "openai/gpt-4.1-mini",                      # OpenAI direct PRIMARY — locale accuracy
+        "openrouter/openai/gpt-4.1-mini",
     ),
     FeatureBucket.seo_keywords: (
-        "openrouter/google/gemini-flash-1.5",
-        "openai/gpt-4o-mini",           # Direct OpenAI fallback
+        "openrouter/google/gemini-flash-1.5",       # near-free, good for SEO lists
+        "openai/gpt-4.1-mini",                      # direct OpenAI fallback
     ),
     FeatureBucket.campaign_strategy: (
-        "openrouter/openai/gpt-4o",
-        "openai/gpt-4o",                # Direct OpenAI fallback
+        "openrouter/openai/gpt-4o",                 # reasoning depth for strategy
+        "openai/gpt-4.1-mini",                      # cheaper fallback
     ),
     FeatureBucket.image_prompting: (
-        "openrouter/openai/gpt-4o-mini",
-        "openai/gpt-4o-mini",           # Direct OpenAI fallback
+        "openrouter/openai/gpt-4.1-mini",           # good image prompt generation
+        "openai/gpt-4.1-mini",                      # direct OpenAI fallback
     ),
     FeatureBucket.image_generation: (
-        # Image generation is always premium/explicit — no cheap fallback
-        "openai/gpt-4o",
-        "openai/gpt-4o",
+        "openrouter/flux/flux-1-schnell",           # ~$0.003/img — cheapest, fast (testing)
+        "openrouter/flux/flux-1-1-pro",             # ~$0.040/img — high quality (production)
     ),
     FeatureBucket.lead_classification: (
-        "openrouter/openai/gpt-4o-mini",
-        "openai/gpt-4o-mini",           # Direct OpenAI fallback
+        "openrouter/openai/gpt-4.1-mini",
+        "openai/gpt-4.1-mini",
     ),
     FeatureBucket.email_copywriting: (
-        "openrouter/openai/gpt-4o-mini",
-        "openai/gpt-4o-mini",           # Direct OpenAI fallback
+        "openrouter/openai/gpt-4.1-mini",
+        "openai/gpt-4.1-mini",
     ),
     FeatureBucket.chatbot: (
-        "openrouter/anthropic/claude-3-haiku",
-        "openai/gpt-4o-mini",           # Direct OpenAI fallback
+        "openrouter/anthropic/claude-3-haiku",      # fast, cheap, friendly tone
+        "openai/gpt-4.1-mini",                      # direct OpenAI fallback
     ),
 }
 
