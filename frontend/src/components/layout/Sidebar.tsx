@@ -70,10 +70,10 @@ function NavSection({ title, items }: { title: string; items: typeof coreNav }) 
           to={to}
           className={({ isActive }) =>
             cn(
-              'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
               isActive
-                ? 'bg-indigo-600 text-white'
-                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                ? 'bg-indigo-600/90 text-white shadow-sm shadow-indigo-900/30'
+                : 'text-gray-400 hover:bg-gray-800/80 hover:text-gray-100'
             )
           }
         >
@@ -97,13 +97,13 @@ export function Sidebar() {
   return (
     <aside className="flex flex-col w-64 min-h-screen bg-gray-900 text-white shrink-0">
       {/* Logo */}
-      <div className="flex items-center gap-2 px-6 py-5 border-b border-gray-800">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-600">
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-800/60">
+        <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 shadow-lg shadow-indigo-900/40 ring-1 ring-indigo-500/50">
           <Zap className="w-5 h-5 text-white" />
         </div>
-        <div>
-          <p className="text-sm font-bold leading-none">SRP AI Marketing</p>
-          <p className="text-xs text-gray-400 mt-0.5">Manager OS</p>
+        <div className="min-w-0">
+          <p className="text-sm font-bold leading-none text-white tracking-tight">SRP AI Marketing</p>
+          <p className="text-[11px] text-indigo-400/80 mt-0.5 font-medium">Manager OS</p>
         </div>
       </div>
 
