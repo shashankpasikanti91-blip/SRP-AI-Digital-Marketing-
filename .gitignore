@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment files (NEVER commit secrets)
+.env
+.env.local
+.env.production
+.env.*.local
+_hashes.json
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+
+# Docker
+.docker/
+
+# Database
+*.sqlite3
+*.db
+postgres_data/
+redis_data/
+
+# Logs
+*.log
+logs/
+celerybeat-schedule
+celerybeat.pid
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# SSL certificates
+nginx/ssl/
+*.pem
+*.crt
+*.key
+
+# Alembic auto-generated (keep versions)
+alembic/versions/*.pyc
