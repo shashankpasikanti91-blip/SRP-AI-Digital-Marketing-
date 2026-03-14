@@ -108,6 +108,14 @@ SYSTEM_TEMPLATES: dict[str, dict] = {
     },
     "restaurant_offer": {
         "background": {"type": "gradient", "colors": ["#7F1D1D", "#991B1B"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 560, "x": -180, "y": -180, "color": "rgba(255,255,255,0.05)"},
+                {"type": "circle", "size": 380, "right": -110, "y": 600, "color": "rgba(251,191,36,0.12)"},
+                {"type": "circle", "size": 200, "right": -50, "y": -50, "border": True, "border_color": "rgba(251,191,36,0.28)", "border_width": 3},
+                {"type": "rect", "w": 1080, "h": 6, "x": 0, "y": 0, "color": "#FBBF24"},
+            ]
+        },
         "accent_strip": {"enabled": True, "color": "#FBBF24", "height": 8},
         "logo": {"position": "top-center", "x": 465, "y": 40, "w": 150, "h": 75},
         "badge": {"x": 380, "y": 145, "type": "pill", "bg": "#FBBF24", "text_color": "#000", "font_size": 28, "bold": True},
@@ -212,6 +220,15 @@ SYSTEM_TEMPLATES: dict[str, dict] = {
     # ── Retail / Shop Discount ────────────────────────────────────────
     "retail_discount": {
         "background": {"type": "gradient", "colors": ["#C2410C", "#EA580C"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 620, "x": -200, "y": -200, "color": "rgba(255,255,255,0.05)"},
+                {"type": "circle", "size": 420, "right": -120, "y": 580, "color": "rgba(252,211,77,0.13)"},
+                {"type": "circle", "size": 220, "right": -60, "y": -60, "border": True, "border_color": "rgba(252,211,77,0.35)", "border_width": 3},
+                {"type": "rect", "w": 1080, "h": 6, "x": 0, "y": 0, "color": "#FED7AA"},
+                {"type": "rect", "w": 200, "h": 200, "right": -55, "bottom": -55, "color": "rgba(252,211,77,0.09)", "rotate": 35, "radius": 16},
+            ]
+        },
         "accent_strip": {"enabled": True, "color": "#FED7AA", "height": 8},
         "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
         "badge": {"x": 380, "y": 135, "type": "pill", "bg": "#FED7AA", "text_color": "#000", "font_size": 28, "bold": True},
@@ -228,6 +245,15 @@ SYSTEM_TEMPLATES: dict[str, dict] = {
     # ── Real Estate Launch ────────────────────────────────────────────
     "real_estate_launch": {
         "background": {"type": "gradient", "colors": ["#78350F", "#92400E"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 600, "x": -200, "y": -200, "color": "rgba(255,255,255,0.05)"},
+                {"type": "circle", "size": 420, "right": -120, "y": 600, "color": "rgba(252,211,77,0.12)"},
+                {"type": "circle", "size": 280, "right": -65, "y": -65, "border": True, "border_color": "rgba(252,211,77,0.28)", "border_width": 3},
+                {"type": "rect", "w": 1080, "h": 6, "x": 0, "y": 0, "color": "#FCD34D"},
+                {"type": "rect", "w": 160, "h": 160, "x": -40, "bottom": -40, "color": "rgba(252,211,77,0.08)", "rotate": 45, "radius": 0},
+            ]
+        },
         "accent_strip": {"enabled": True, "color": "#FCD34D", "height": 8},
         "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
         "badge": {"x": 380, "y": 135, "type": "pill", "bg": "#FCD34D", "text_color": "#000", "font_size": 26, "bold": True},
@@ -243,6 +269,14 @@ SYSTEM_TEMPLATES: dict[str, dict] = {
     # ── Coaching Institute ─────────────────────────────────────────────
     "coaching_institute": {
         "background": {"type": "gradient", "colors": ["#0C4A6E", "#0369A1"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 600, "x": -200, "y": -200, "color": "rgba(56,189,248,0.09)"},
+                {"type": "circle", "size": 380, "right": -110, "y": 700, "color": "rgba(56,189,248,0.07)"},
+                {"type": "circle", "size": 210, "right": -55, "y": -55, "border": True, "border_color": "rgba(56,189,248,0.28)", "border_width": 3},
+                {"type": "rect", "w": 1080, "h": 6, "x": 0, "y": 0, "color": "#38BDF8"},
+            ]
+        },
         "accent_strip": {"enabled": True, "color": "#38BDF8", "height": 8},
         "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
         "badge": {"x": 380, "y": 135, "type": "pill", "bg": "#38BDF8", "text_color": "#000", "font_size": 26, "bold": True},
@@ -259,6 +293,15 @@ SYSTEM_TEMPLATES: dict[str, dict] = {
     # ── Beauty Salon / Parlour ────────────────────────────────────────
     "beauty_salon": {
         "background": {"type": "gradient", "colors": ["#9D174D", "#BE185D"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 560, "x": -200, "y": -200, "color": "rgba(255,255,255,0.07)"},
+                {"type": "circle", "size": 360, "right": -100, "y": 600, "color": "rgba(249,168,212,0.16)"},
+                {"type": "circle", "size": 190, "right": -45, "y": -45, "border": True, "border_color": "rgba(249,168,212,0.40)", "border_width": 3},
+                {"type": "rect", "w": 1080, "h": 6, "x": 0, "y": 0, "color": "#F9A8D4"},
+                {"type": "rect", "w": 170, "h": 170, "x": -45, "bottom": -45, "color": "rgba(249,168,212,0.11)", "rotate": 30, "radius": 24},
+            ]
+        },
         "accent_strip": {"enabled": True, "color": "#F9A8D4", "height": 8},
         "logo": {"position": "top-center", "x": 465, "y": 40, "w": 150, "h": 75},
         "badge": {"x": 380, "y": 145, "type": "pill", "bg": "#F9A8D4", "text_color": "#000", "font_size": 26, "bold": True},
@@ -275,6 +318,15 @@ SYSTEM_TEMPLATES: dict[str, dict] = {
     # ── Gym / Fitness ─────────────────────────────────────────────────
     "gym_offer": {
         "background": {"type": "gradient", "colors": ["#111827", "#1F2937"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 700, "x": -250, "y": -250, "color": "rgba(249,115,22,0.08)"},
+                {"type": "circle", "size": 420, "right": -130, "y": 600, "color": "rgba(249,115,22,0.07)"},
+                {"type": "rect", "w": 1080, "h": 6, "x": 0, "y": 0, "color": "#F97316"},
+                {"type": "rect", "w": 10, "h": 800, "x": 0, "y": 140, "color": "rgba(249,115,22,0.35)"},
+                {"type": "rect", "w": 200, "h": 200, "right": -55, "bottom": -55, "color": "rgba(249,115,22,0.08)", "rotate": 45, "radius": 0},
+            ]
+        },
         "accent_strip": {"enabled": True, "color": "#F97316", "height": 8},
         "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
         "badge": {"x": 380, "y": 135, "type": "pill", "bg": "#F97316", "text_color": "#FFF", "font_size": 26, "bold": True},
@@ -291,6 +343,15 @@ SYSTEM_TEMPLATES: dict[str, dict] = {
     # ── Event / Programme ─────────────────────────────────────────────
     "event_announcement": {
         "background": {"type": "gradient", "colors": ["#4C1D95", "#6D28D9"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 620, "x": -200, "y": -200, "color": "rgba(196,181,253,0.09)"},
+                {"type": "circle", "size": 400, "right": -120, "y": 620, "color": "rgba(196,181,253,0.08)"},
+                {"type": "circle", "size": 210, "right": -50, "y": -50, "border": True, "border_color": "rgba(196,181,253,0.30)", "border_width": 3},
+                {"type": "rect", "w": 1080, "h": 6, "x": 0, "y": 0, "color": "#C4B5FD"},
+                {"type": "rect", "w": 190, "h": 190, "x": -50, "bottom": -50, "color": "rgba(196,181,253,0.08)", "rotate": 30, "radius": 0},
+            ]
+        },
         "accent_strip": {"enabled": True, "color": "#C4B5FD", "height": 8},
         "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
         "badge": {"x": 380, "y": 135, "type": "pill", "bg": "#C4B5FD", "text_color": "#000", "font_size": 26, "bold": True},
@@ -302,9 +363,42 @@ SYSTEM_TEMPLATES: dict[str, dict] = {
         "cta": {"x": 40, "y": 870, "w": 1000, "h": 72, "bg": "#C4B5FD", "text_color": "#000", "font_size": 32, "bold": True, "border_radius": 12},
         "footer": {"x": 0, "y": 975, "w": 1080, "h": 105, "bg": "#2E1065", "text_color": "#FFFFFF", "font_size": 20},
     },
+    # ── Garment / Fashion Sale ────────────────────────────────────────
+    "garment_sale": {
+        "background": {"type": "gradient", "colors": ["#881337", "#BE123C", "#9F1239"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 700, "x": -240, "y": -240, "color": "rgba(255,255,255,0.05)"},
+                {"type": "circle", "size": 460, "right": -130, "y": 620, "color": "rgba(253,164,175,0.13)"},
+                {"type": "circle", "size": 250, "right": -70, "y": -70, "border": True, "border_color": "rgba(253,164,175,0.38)", "border_width": 4},
+                {"type": "rect", "w": 1080, "h": 8, "x": 0, "y": 0, "color": "#FDA4AF"},
+                {"type": "rect", "w": 210, "h": 210, "x": -60, "bottom": -60, "color": "rgba(253,164,175,0.09)", "rotate": 30, "radius": 20},
+            ]
+        },
+        "accent_strip": {"enabled": True, "color": "#FDA4AF", "height": 8},
+        "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
+        "badge": {"x": 340, "y": 135, "type": "pill", "bg": "#FDA4AF", "text_color": "#881337", "font_size": 30, "bold": True},
+        "title": {"x": 40, "y": 240, "w": 1000, "font_size": 64, "bold": True, "color": "#FFFFFF", "align": "center"},
+        "regional_title": {"x": 40, "y": 325, "w": 1000, "font_size": 40, "bold": True, "color": "#FDA4AF", "align": "center"},
+        "subtitle": {"x": 40, "y": 385, "w": 1000, "font_size": 26, "color": "#FECDD3", "align": "center"},
+        "price_block": {"x": 40, "y": 492, "font_size": 90, "color": "#FDA4AF", "bold": True, "align": "center"},
+        "original_price": {"x": 40, "y": 600, "font_size": 32, "color": "#9CA3AF", "strikethrough": True, "align": "center"},
+        "checklist": {"x": 60, "y": 658, "font_size": 24, "icon": "✿", "icon_color": "#FDA4AF", "color": "#FFFFFF", "columns": 2, "line_height": 46},
+        "date_block": {"x": 40, "y": 844, "font_size": 26, "color": "#FECDD3", "bold": True, "align": "center"},
+        "cta": {"x": 40, "y": 900, "w": 1000, "h": 72, "bg": "#FDA4AF", "text_color": "#881337", "font_size": 32, "bold": True, "border_radius": 12},
+        "footer": {"x": 0, "y": 1000, "w": 1080, "h": 80, "bg": "#4C0519", "text_color": "#FFFFFF", "font_size": 20},
+    },
     # ── Generic fallback for new industry slugs ───────────────────────
     "bakery_offer": {
         "background": {"type": "gradient", "colors": ["#C2410C", "#EA580C"], "direction": "135deg"},
+        "shapes": {
+            "shapes": [
+                {"type": "circle", "size": 600, "x": -190, "y": -190, "color": "rgba(255,255,255,0.05)"},
+                {"type": "circle", "size": 400, "right": -110, "y": 570, "color": "rgba(252,211,77,0.12)"},
+                {"type": "circle", "size": 200, "right": -55, "y": -55, "border": True, "border_color": "rgba(252,211,77,0.32)", "border_width": 3},
+                {"type": "rect", "w": 1080, "h": 6, "x": 0, "y": 0, "color": "#FED7AA"},
+            ]
+        },
         "accent_strip": {"enabled": True, "color": "#FED7AA", "height": 8},
         "logo": {"position": "top-left", "x": 40, "y": 40, "w": 140, "h": 70},
         "badge": {"x": 380, "y": 135, "type": "pill", "bg": "#FED7AA", "text_color": "#000", "font_size": 26, "bold": True},
@@ -503,7 +597,7 @@ SYSTEM_TEMPLATES: dict[str, dict] = {
 # Map slugs that share a layout with an existing template
 SLUG_LAYOUT_MAP: dict[str, str] = {
     "hotel_event":         "restaurant_offer",
-    "garment_sale":        "retail_discount",
+    # garment_sale now has its own premium template in SYSTEM_TEMPLATES
     "electronics_sale":    "retail_discount",
     "rental_property":     "real_estate_launch",
     "school_admission":    "coaching_institute",

@@ -209,7 +209,7 @@ const LayerBadge = ({ l }: { l: RawLayer }) => {
       letterSpacing: '0.06em',
       padding: `${fs * 0.25}px ${fs * 0.6}px`,
       textTransform: 'uppercase' as const,
-      boxShadow: `0 4px 16px ${bg}66`,
+      boxShadow: `0 4px 20px ${bg}88, inset 0 1px 0 rgba(255,255,255,0.25)`,
       whiteSpace: 'nowrap',
       textAlign: 'center',
     }}>{label}</div>
@@ -226,7 +226,7 @@ const LayerTitle = ({ l }: { l: RawLayer }) => {
       color: l.color || l.text_color || '#FFF',
       textAlign: (l.align || 'center') as React.CSSProperties['textAlign'],
       lineHeight: 1.15,
-      textShadow: '0 2px 12px rgba(0,0,0,0.45)',
+      textShadow: '0 2px 16px rgba(0,0,0,0.6), 0 4px 32px rgba(0,0,0,0.3)',
       letterSpacing: '-0.01em',
     }}>{label}</div>
   );
@@ -320,11 +320,11 @@ const LayerCta = ({ l }: { l: RawLayer }) => {
         zIndex: 6,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }),
-      background: bg,
+      background: `linear-gradient(180deg, ${bg} 0%, ${bg}dd 100%)`,
       color: l.text_color || '#000',
       fontSize: fs, fontWeight: 900, fontFamily: FONT,
       borderRadius: l.border_radius ?? 12,
-      boxShadow: `0 6px 28px ${bg}88, inset 0 1px 0 rgba(255,255,255,0.2)`,
+      boxShadow: `0 6px 28px ${bg}99, inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.2)`,
       textAlign: 'center',
       letterSpacing: '0.01em',
     }}>{label}</div>
@@ -375,7 +375,8 @@ const LayerServiceGrid = ({ l }: { l: RawLayer }) => {
           alignItems: 'center', justifyContent: 'center',
           padding: '10px 8px',
           textAlign: 'center',
-          border: '1px solid rgba(255,255,255,0.09)',
+          border: '1px solid rgba(255,255,255,0.12)',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.25)',
           minHeight: fs * 3.5,
         }}>
           <span style={{ color: iconColor, fontSize: fs * 1.3, lineHeight: 1 }}>{icon}</span>

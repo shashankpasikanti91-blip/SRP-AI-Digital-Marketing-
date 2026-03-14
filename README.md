@@ -147,8 +147,8 @@ Each task is classified into a `FeatureBucket` which determines model routing:
 |---------------|---------------|----------|-----------|
 | `text_basic` | Gemini Flash 1.5 (OpenRouter) | GPT-4o-mini (OpenAI) | Cheapest for short copy |
 | `text_marketing` | GPT-4o-mini (OpenRouter) | GPT-4o-mini (OpenAI) | Reliable marketing copy |
-| `translation` | GPT-4o-mini (OpenAI direct) | Gemini Flash (OpenRouter) | Best for Indian scripts |
-| `localization` | GPT-4o-mini (OpenAI direct) | GPT-4o-mini (OpenRouter) | Locale accuracy |
+| `translation` | GPT-4.1-mini (OpenRouter) | GPT-4.1-mini (OpenAI direct) | Cheaper, same multilingual quality |
+| `localization` | GPT-4.1-mini (OpenRouter) | GPT-4.1-mini (OpenAI direct) | Cost-efficient locale accuracy |
 | `seo_keywords` | Gemini Flash 1.5 (OpenRouter) | GPT-4o-mini (OpenAI) | Cost-efficient |
 | `campaign_strategy` | GPT-4o (OpenRouter) | GPT-4o (OpenAI) | Deep reasoning |
 | `email_copywriting` | GPT-4o-mini (OpenRouter) | GPT-4o-mini (OpenAI) | Reliable email copy |
@@ -157,8 +157,8 @@ Each task is classified into a `FeatureBucket` which determines model routing:
 
 ### Cost Control
 
-- **OpenRouter** — primary for most content tasks (significantly cheaper than OpenAI direct)
-- **OpenAI direct** — primary for translation/localization (most reliable for non-Latin character sets)
+- **OpenRouter** — primary for ALL AI tasks (content, translation, localization — cheapest routes)
+- **OpenAI direct** — fallback for translation/localization (when OpenRouter key missing/errors)
 - **Automatic fallback** — if primary provider key is missing or errors, router falls back seamlessly
 - **Usage tracking** — every AI call logged with token counts and estimated USD cost per tenant
 - **Plan limits** — `PlanLimitService` checks monthly limits before every call; HTTP 402 if exceeded
@@ -229,7 +229,7 @@ CreativeOutput
 
 **SE Asian:** Malay, Indonesian, Thai, Chinese Simplified
 
-Translation uses GPT-4o-mini direct (most reliable for Indian scripts and non-Latin character sets), with OpenRouter Gemini Flash as fallback.
+Translation uses GPT-4.1-mini via OpenRouter (primary, cheaper) with OpenAI direct as fallback. All Indian script enforcement is done via CRITICAL SCRIPT RULE guidance in `TRANSLATION_GUIDANCE`.
 
 ---
 
@@ -566,7 +566,7 @@ apt-get install -y docker-compose-plugin git certbot curl
 
 ```bash
 cd /opt
-git clone https://github.com/srp-ai-digital/srp-marketing-os.git
+git clone https://github.com/shashankpasikanti91-blip/SRP-AI-Digital-Marketing-.git srp-marketing-os
 cd srp-marketing-os/ai-marketing-os
 ```
 
@@ -656,11 +656,23 @@ curl -sI https://app.srpailabs.com | head -5
 echo "0 3 * * * certbot renew --quiet && docker compose -f /opt/srp-marketing-os/ai-marketing-os/docker-compose.yml exec nginx nginx -s reload" | crontab -
 ```
 
-### Updating production
+### One-line deploy (first time)
 
 ```bash
+ssh root@5.223.67.236 "bash <(curl -fsSL https://raw.githubusercontent.com/shashankpasikanti91-blip/SRP-AI-Digital-Marketing-/main/ai-marketing-os/scripts/deploy.sh) --init"
+```
+
+### Updating production (subsequent deploys)
+
+```bash
+# One command — pulls latest, rebuilds, migrates
+ssh root@5.223.67.236 "bash /opt/srp-marketing-os/ai-marketing-os/scripts/deploy.sh"
+```
+
+Or manually:
+```bash
 cd /opt/srp-marketing-os/ai-marketing-os
-git pull origin master
+git pull origin main
 docker compose up --build -d
 docker compose exec backend alembic upgrade head
 ```
@@ -754,6 +766,42 @@ ai-marketing-os/
 ---
 
 ## Release Notes
+
+### v1.3.1 — Deployment & Stability Fix (14 March 2026)
+
+**Infrastructure**
+
+- **Migration 010 added** — `social_posts` table was missing `campaign` (VARCHAR 120) and `ai_generated` (BOOLEAN) columns that the SQLAlchemy model defined. New migration `010_social_posts_missing_columns` adds both with index on `campaign`.
+- **Celery worker/beat healthcheck fixed** — containers were always `unhealthy` because the backend `Dockerfile` HEALTHCHECK (`curl http://localhost:8000/health`) is wrong for Celery processes. Overridden in `docker-compose.yml` to use `celery inspect ping` — both workers now show **healthy**.
+- **One-command deploy script added** — `scripts/deploy.sh` handles first-time server setup (`--init` flag), SSL certificate issuance via certbot, Docker install, firewall config, migrations, and seeding in one script.
+- **nginx HTTP-only init config added** — `nginx/nginx-init.conf` solves the chicken-and-egg problem: start nginx on port 80 only to serve ACME challenges → get SSL cert → restart with full HTTPS config.
+- **GitHub repo URL corrected** — all deploy docs now reference the correct repo: `shashankpasikanti91-blip/SRP-AI-Digital-Marketing-`
+
+---
+
+### v1.3.0 — Visual & Language Quality Release
+
+**Poster Visual Enhancements**
+
+- **All poster templates now have Canva-style decorative shapes** — every flat template (`retail_discount`, `real_estate_launch`, `coaching_institute`, `beauty_salon`, `gym_offer`, `event_announcement`, `restaurant_offer`, `bakery_offer`) now has a `shapes` layer with decorative circles, accent lines, and corner squares for visual depth.
+- **New premium `garment_sale` template** — dedicated fashion poster with deep rose/crimson gradient (`#881337→#9F1239`), rose-pink (`#FDA4AF`) accent shapes, and full Canva-style layout. Previously fell back to `retail_discount`.
+- **`PosterRenderer.tsx` enhanced visuals** — CTA buttons now use gradient with 3D inset shadow; title text shadows deepened; badge glows strengthened; service grid cards have `boxShadow` for depth.
+
+**Language & Script Fixes**
+
+- **ALL Indian language scripts now enforced** — `TRANSLATION_GUIDANCE` for all 10 languages (Telugu, Hindi, Tamil, Kannada, Malayalam, Bengali, Marathi, Gujarati, Punjabi, Odia) now includes a `SCRIPT RULE` with Unicode range — AI is explicitly forbidden from using Devanagari for non-Hindi languages.
+- **Bunty Cloth Store fixed** — was incorrectly showing Hindi text. All Bunty poster data is now in Telugu:
+  - `మహా సేల్ / MEGA SALE`, service items in Telugu, CTA and footer in Telugu
+  - `language_primary` corrected from `"hindi"` to `"telugu"`
+  - Hashtags updated: `TeluguSale`, `Vastralu` (replacing `HindiSale`, `Kapde`)
+  - WhatsApp SocialPost content fully in Telugu
+  - Campaign data `secondary_language` set to `"telugu"`
+
+**AI Cost Optimisation**
+
+- **OpenRouter is now primary for ALL feature buckets** including `translation` and `localization` — previously these used OpenAI direct as primary. OpenRouter routes to the same GPT-4.1-mini model at lower cost. OpenAI direct remains as fallback.
+
+---
 
 ### v1.2.0 — 14 March 2026
 

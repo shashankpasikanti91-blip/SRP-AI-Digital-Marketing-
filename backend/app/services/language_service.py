@@ -171,49 +171,58 @@ class LanguageService:
     TRANSLATION_GUIDANCE = {
         # ── Indian Languages ────────────────────────────────────────────
         "telugu": (
-            "Translate to natural, spoken Telugu used in Telangana/Andhra Pradesh. "
-            "Use Telugu script (not transliteration). Keep medical/technical terms readable "
-            "(e.g. X-Ray stays as X-Ray). Make it warm and community-friendly. "
-            "Example: 'Free Health Camp' → 'ఉచిత ఆరోగ్య శిబిరం'"
+            "CRITICAL SCRIPT RULE: Use ONLY Telugu Unicode script (U+0C00–U+0C7F). "
+            "This is a HARD REQUIREMENT — NEVER use Hindi/Devanagari (U+0900–U+097F) for any Telugu field. "
+            "The city (e.g. Nagpur, Pune, Mumbai) does NOT determine the script — Telugu ALWAYS uses Telugu script. "
+            "Translate to natural spoken Telugu used in Telangana/Andhra Pradesh. "
+            "Keep medical/technical terms readable (e.g. X-Ray stays as X-Ray). Warm and community-friendly tone. "
+            "Examples: 'ఉచిత ఆరోగ్య శిబిరం', 'మహా సేల్', 'ఈరోజే కొనండి', 'భారీ తగ్గింపు', 'ఇప్పుడే కాల్ చేయండి'."
         ),
         "hindi": (
-            "Translate to clear, conversational Hindi (Devanagari script). "
+            "SCRIPT RULE: Use ONLY Hindi Devanagari script (U+0900–U+097F). "
+            "Translate to clear, conversational Hindi. "
             "Prefer common words over formal Sanskrit. Keep English brand names intact. "
             "Example: 'Free Health Camp' → 'निःशुल्क स्वास्थ्य शिविर'"
         ),
         "tamil": (
-            "Translate to modern Tamil used in Tamil Nadu (Tamil script). "
+            "SCRIPT RULE: Use ONLY Tamil Unicode script (U+0B80–U+0BFF). NEVER use Devanagari. "
+            "Translate to modern Tamil used in Tamil Nadu. "
             "Keep medical and technical terms in English where commonly understood. "
             "Example: 'Free Health Camp' → 'இலவச உடல்நல முகாம்'"
         ),
         "kannada": (
-            "Translate to natural Kannada used in Karnataka (Kannada script). "
+            "SCRIPT RULE: Use ONLY Kannada Unicode script (U+0C80–U+0CFF). NEVER use Devanagari. "
+            "Translate to natural Kannada used in Karnataka. "
             "Example: 'Free Health Camp' → 'ಉಚಿತ ಆರೋಗ್ಯ ಶಿಬಿರ'"
         ),
         "malayalam": (
-            "Translate to natural Malayalam (Malayalam script). "
+            "SCRIPT RULE: Use ONLY Malayalam Unicode script (U+0D00–U+0D7F). NEVER use Devanagari. "
+            "Translate to natural Malayalam used in Kerala. "
             "Example: 'Free Health Camp' → 'സൗജന്യ ആരോഗ്യ ക്യാമ്പ്'"
         ),
         "bengali": (
-            "Translate to standard Bengali/Bangla (Bengali script) used in West Bengal. "
-            "Keep brand and technical terms intact. "
+            "SCRIPT RULE: Use ONLY Bengali/Bangla Unicode script (U+0980–U+09FF). NEVER use Devanagari. "
+            "Translate to standard Bengali used in West Bengal. Keep brand and technical terms intact. "
             "Example: 'Free Health Camp' → 'বিনামূল্যে স্বাস্থ্য শিবির'"
         ),
         "marathi": (
-            "Translate to natural Marathi (Devanagari script) used in Maharashtra. "
-            "Prefer common spoken Marathi over formal. "
+            "SCRIPT RULE: Use Marathi Devanagari script. You are writing Marathi, NOT Hindi. "
+            "Translate to natural spoken Marathi used in Maharashtra. "
             "Example: 'Free Health Camp' → 'मोफत आरोग्य शिबिर'"
         ),
         "gujarati": (
-            "Translate to natural Gujarati (Gujarati script) used in Gujarat. "
+            "SCRIPT RULE: Use ONLY Gujarati Unicode script (U+0A80–U+0AFF). NEVER use Devanagari. "
+            "Translate to natural Gujarati used in Gujarat. "
             "Example: 'Free Health Camp' → 'મફત આરોગ્ય કેમ્પ'"
         ),
         "punjabi": (
-            "Translate to Punjabi in Gurmukhi script used in Punjab, India. "
+            "SCRIPT RULE: Use ONLY Gurmukhi Unicode script (U+0A00–U+0A7F). NEVER use Devanagari. "
+            "Translate to Punjabi used in Punjab, India. "
             "Example: 'Free Health Camp' → 'ਮੁਫਤ ਸਿਹਤ ਕੈਂਪ'"
         ),
         "odia": (
-            "Translate to natural Odia (Odia script) used in Odisha. "
+            "SCRIPT RULE: Use ONLY Odia Unicode script (U+0B00–U+0B7F). NEVER use Devanagari. "
+            "Translate to natural Odia used in Odisha. "
             "Example: 'Free Health Camp' → 'ମୁଫ୍ତ ସ୍ୱାସ୍ଥ୍ୟ ଶିବିର'"
         ),
         # ── South-East Asia / Oceania ───────────────────────────────────
@@ -546,7 +555,18 @@ Your task:
 Translation rules:
 {translation_hint if translation_hint else f"Translate naturally into {lang_display}. Keep brand names, prices, and phone numbers the same."}
 
-Important:
+CRITICAL SCRIPT ENFORCEMENT:
+- For Telugu: ONLY use Telugu Unicode (U+0C00–U+0C7F). ABSOLUTELY NEVER use Devanagari/Hindi script.
+- For Tamil: ONLY use Tamil Unicode (U+0B80–U+0BFF). NEVER use Devanagari.
+- For Kannada: ONLY use Kannada Unicode (U+0C80–U+0CFF). NEVER use Devanagari.
+- For Bengali: ONLY use Bengali Unicode (U+0980–U+09FF). NEVER use Devanagari.
+- For Gujarati: ONLY use Gujarati Unicode (U+0A80–U+0AFF). NEVER use Devanagari.
+- For Punjabi: ONLY use Gurmukhi Unicode (U+0A00–U+0A7F). NEVER use Devanagari.
+- For Odia: ONLY use Odia Unicode (U+0B00–U+0B7F). NEVER use Devanagari.
+- The city's geographic location (e.g. Nagpur, Pune) does NOT change the required script.
+- If secondary_language is Telugu, ALL regional_* fields MUST contain Telugu script only.
+
+General rules:
 - Titles must be SHORT and PUNCHY (max 6-8 words in each language)
 - Technical/medical terms (X-Ray, ECG, CT Scan, NEET, etc.) stay in English in both languages
 - Keep phone numbers, prices, dates, and addresses identical in both languages

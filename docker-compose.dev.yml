@@ -13,16 +13,30 @@ services:
     environment:
       ENVIRONMENT: development
       DEBUG: "true"
+      REDIS_URL: "redis://:redis_secret@redis:6379/0"
+      DATABASE_URL: "postgresql+asyncpg://ats_user:ats_password@db:5432/srp_marketing"
+      CELERY_BROKER_URL: "redis://:redis_secret@redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://:redis_secret@redis:6379/1"
     ports:
-      - "8000:8000"
+      - "8001:8000"
 
   celery-worker:
     command: celery -A app.workers.celery_app worker --loglevel=debug --concurrency=2 --queues=celery,ai,social,email
+    environment:
+      REDIS_URL: "redis://:redis_secret@redis:6379/0"
+      DATABASE_URL: "postgresql+asyncpg://ats_user:ats_password@db:5432/srp_marketing"
+      CELERY_BROKER_URL: "redis://:redis_secret@redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://:redis_secret@redis:6379/1"
     volumes:
       - ./backend:/app
 
   celery-beat:
-    command: celery -A app.workers.celery_app beat --loglevel=debug
+    command: celery -A app.workers.celery_app beat --loglevel=debug --schedule /tmp/celerybeat-schedule
+    environment:
+      REDIS_URL: "redis://:redis_secret@redis:6379/0"
+      DATABASE_URL: "postgresql+asyncpg://ats_user:ats_password@db:5432/srp_marketing"
+      CELERY_BROKER_URL: "redis://:redis_secret@redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://:redis_secret@redis:6379/1"
     volumes:
       - ./backend:/app
 
@@ -36,7 +50,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      VITE_API_URL: http://localhost:8000/api/v1
+      VITE_API_URL: http://localhost:8001/api/v1
 
   # Flower — Celery monitoring UI (dev only)
   flower:

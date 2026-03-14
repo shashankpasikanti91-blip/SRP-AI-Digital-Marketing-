@@ -248,12 +248,12 @@ BUCKET_MODEL_MAP: dict[FeatureBucket, tuple[str, str]] = {
         "openai/gpt-4.1-mini",                      # direct OpenAI fallback
     ),
     FeatureBucket.translation: (
-        "openai/gpt-4.1-mini",                      # OpenAI direct PRIMARY — best multilingual
-        "openrouter/openai/gpt-4.1-mini",           # OpenRouter secondary
+        "openrouter/openai/gpt-4.1-mini",           # OpenRouter PRIMARY — cheaper, multilingual
+        "openai/gpt-4.1-mini",                      # OpenAI direct fallback
     ),
     FeatureBucket.localization: (
-        "openai/gpt-4.1-mini",                      # OpenAI direct PRIMARY — locale accuracy
-        "openrouter/openai/gpt-4.1-mini",
+        "openrouter/openai/gpt-4.1-mini",           # OpenRouter PRIMARY — cheaper, locale accuracy
+        "openai/gpt-4.1-mini",                      # OpenAI direct fallback
     ),
     FeatureBucket.seo_keywords: (
         "openrouter/google/gemini-flash-1.5",       # near-free, good for SEO lists

@@ -12,8 +12,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-srp_marketing}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    # Port not exposed externally — backend connects via internal 'backend' network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-srp} -d ${POSTGRES_DB:-srp_marketing}"]
       interval: 10s
@@ -29,8 +28,7 @@ services:
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_secret}
     volumes:
       - redis_data:/data
-    ports:
-      - "6379:6379"
+    # Port not exposed externally — workers connect via internal 'backend' network
     healthcheck:
       test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD:-redis_secret}", "ping"]
       interval: 10s
@@ -86,6 +84,12 @@ services:
       - ./backend:/app:ro
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.workers.celery_app inspect ping -d celery@$$HOSTNAME || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
 
   # ── Celery Beat Scheduler ───────────────────────────────────────────────
   celery-beat:
@@ -93,7 +97,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     restart: unless-stopped
-    command: celery -A app.workers.celery_app beat --loglevel=info --scheduler celery.beat.PersistentScheduler
+    command: celery -A app.workers.celery_app beat --loglevel=info --scheduler celery.beat.PersistentScheduler --schedule /tmp/celerybeat-schedule
     env_file: .env
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-srp}:${POSTGRES_PASSWORD:-srp_secret}@db:5432/${POSTGRES_DB:-srp_marketing}
@@ -105,9 +109,14 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app:ro
-      - celery_beat_data:/app/celerybeat-schedule
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.workers.celery_app inspect ping --timeout 5 2>&1 | grep -q pong || exit 1"]
+      interval: 30s
+      timeout: 15s
+      start_period: 60s
+      retries: 3
 
   # ── Frontend React ──────────────────────────────────────────────────────
   frontend:
@@ -141,7 +150,6 @@ services:
 volumes:
   postgres_data:
   redis_data:
-  celery_beat_data:
   certbot_webroot:
 
 # ── Networks ─────────────────────────────────────────────────────────────────

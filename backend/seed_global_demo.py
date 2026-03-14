@@ -4,7 +4,7 @@ Global Demo Poster Seeder — SRP AI Marketing OS
 Seeds extra poster variants for client demo purposes:
 
   • Bengaluru IT Agency  — Hindi bilingual job opening (→ demo@srp.ai)
-  • Bunty Cloth Store    — Hindi bilingual discount offer (→ bunty@srp.ai)
+  • Bunty Cloth Store    — Telugu bilingual discount offer (→ bunty@srp.ai)
   • Australia demo       — English retail poster (→ demo@srp.ai)
   • New Zealand demo     — English event poster (→ demo@srp.ai)
 
@@ -130,7 +130,7 @@ def make_it_job_poster_linkedin(company: str, city: str, role: str, salary: str)
 
 
 def make_cloth_discount_instagram(org_name: str, city: str, discount: str) -> dict:
-    """Bunty Cloth Store — Hindi discount offer — Instagram 1080×1080"""
+    """Bunty Cloth Store — Telugu discount offer — Instagram 1080×1080"""
     return {
         "platform": "instagram_square",
         "dimensions": {"width": 1080, "height": 1080},
@@ -147,30 +147,30 @@ def make_cloth_discount_instagram(org_name: str, city: str, discount: str) -> di
             {"type": "badge", "value": f"SALE • {discount} OFF",
              "x": 340, "y": 125,
              "bg": "#FCD34D", "text_color": "#7F1D1D", "font_size": 32, "bold": True},
-            {"type": "title", "value": "महा सेल / MEGA SALE",
+            {"type": "title", "value": "మహా సేల్ / MEGA SALE",
              "x": 40, "y": 220, "w": 1000,
              "font_size": 72, "bold": True, "color": "#FFFFFF", "align": "center"},
-            {"type": "subtitle", "value": "कपड़ों पर बड़ी छूट / Big Discount on All Clothes",
+            {"type": "subtitle", "value": "అన్ని దుస్తులపై తగ్గింపు / Big Discount on All Clothes",
              "x": 40, "y": 310, "w": 1000,
              "font_size": 30, "color": "#FEF3C7", "align": "center"},
             {"type": "service_grid",
              "items": [
-                 "सूट & साड़ी / Suits & Sarees",
-                 "शर्ट & पैंट / Shirts & Pants",
-                 "लेहंगा & कुर्ती / Lehenga & Kurti",
-                 "जींस & टी-शर्ट / Jeans & T-shirts",
-                 "किड्स वियर / Kids Wear",
-                 "वेडिंग कलेक्शन / Wedding",
+                 "సూట్ & చీరలు / Suits & Sarees",
+                 "చొక్కాలు & పాంట్లు / Shirts & Pants",
+                 "లెహంగా & కుర్తీ / Lehenga & Kurti",
+                 "జీన్స్ & టీ-షర్ట్ / Jeans & T-shirts",
+                 "పిల్లల దుస్తులు / Kids Wear",
+                 "పెళ్ళి కలెక్షన్ / Wedding",
              ],
              "columns": 2, "icon": "🎁", "icon_color": "#FCD34D",
              "item_bg": "rgba(0,0,0,0.15)"},
             {"type": "price_block", "value": discount + " OFF",
              "x": 40, "y": 730, "w": 1000,
              "font_size": 90, "color": "#FCD34D", "bold": True, "align": "center"},
-            {"type": "text", "value": "सभी ब्रांड्स पर / On All Brands  |  Limited Time Offer!",
+            {"type": "text", "value": "అన్ని బ్రాండ్లపై / On All Brands  |  Limited Time Offer!",
              "x": 40, "y": 840, "w": 1000,
              "font_size": 26, "color": "#FEF3C7", "align": "center"},
-            {"type": "cta", "value": "🛍️ आज ही खरीदें / Shop Today",
+            {"type": "cta", "value": "🛍️ ఈరోజే కొనండి / Shop Today",
              "x": 40, "y": 900, "w": 1000, "h": 72,
              "bg": "#FCD34D", "text_color": "#7F1D1D", "font_size": 32, "bold": True,
              "border_radius": 12},
@@ -194,13 +194,13 @@ def make_cloth_discount_whatsapp(org_name: str, city: str, discount: str) -> dic
                 {"type": "circle", "size": 400, "x": 900, "y": 750, "color": "rgba(251,191,36,0.1)"},
             ]},
             {"type": "accent_strip", "color": "#FCD34D", "height": 8},
-            {"type": "badge", "value": "सीमित समय / LIMITED TIME",
+            {"type": "badge", "value": "పరిమిత సమయం / LIMITED TIME",
              "x": 320, "y": 100,
              "bg": "#FCD34D", "text_color": "#7C2D12", "font_size": 24, "bold": True},
-            {"type": "title", "value": f"🎉 {discount} की छूट!",
+            {"type": "title", "value": f"🎉 {discount} తగ్గింపు!",
              "x": 40, "y": 190, "w": 1000,
              "font_size": 80, "bold": True, "color": "#FFFFFF", "align": "center"},
-            {"type": "subtitle", "value": "हर कपड़े पर / On Every Item",
+            {"type": "subtitle", "value": "ప్రతి దుస్తుపై / On Every Item",
              "x": 40, "y": 285, "w": 1000,
              "font_size": 34, "color": "#FEF3C7", "align": "center"},
             {"type": "text", "value": org_name,
@@ -211,16 +211,16 @@ def make_cloth_discount_whatsapp(org_name: str, city: str, discount: str) -> dic
              "font_size": 28, "color": "#FED7AA", "align": "center"},
             {"type": "service_grid",
              "items": [
-                 "साड़ी / Saree", "सूट / Suits", "कुर्ती / Kurti",
-                 "शर्ट / Shirts", "जींस / Jeans", "Kids Wear",
+                 "చీరలు / Saree", "సూట్లు / Suits", "కుర్తీ / Kurti",
+                 "చొక్కాలు / Shirts", "జీన్స్ / Jeans", "పిల్లల దుస్తులు / Kids Wear",
              ],
              "columns": 3, "icon": "✂️", "icon_color": "#FCD34D",
              "item_bg": "rgba(0,0,0,0.2)"},
-            {"type": "cta", "value": "📞 अभी Call करें — जल्दी करें!",
+            {"type": "cta", "value": "📞 ఇప్పుడే Call చేయండి — తొందరగా!",
              "x": 40, "y": 880, "w": 1000, "h": 72,
              "bg": "#FCD34D", "text_color": "#7C2D12", "font_size": 32, "bold": True,
              "border_radius": 12},
-            {"type": "footer", "value": f"{org_name}  •  आज ही आएं — Don't Miss!",
+            {"type": "footer", "value": f"{org_name}  •  ఈరోజే రండి — Don't Miss!",
              "x": 0, "y": 1005, "w": 1080, "h": 75,
              "bg": "#431407", "text_color": "#FFFFFF", "font_size": 18},
         ],
@@ -523,7 +523,7 @@ async def seed():
         ))
 
         # ====================================================================
-        # 2. Bunty Cloth Store — Hindi discount offer (bunty@srp.ai)
+        # 2. Bunty Cloth Store — Telugu discount offer (bunty@srp.ai)
         # ====================================================================
         CLOTH_ORG     = "Bunty Cloth Store"
         CLOTH_CITY    = "Nagpur"
@@ -535,20 +535,20 @@ async def seed():
                 tenant_id=bunty_tenant.id,
                 platform="instagram_square",
                 width="1080", height="1080",
-                language_primary="hindi", language_secondary="english",
+                language_primary="telugu", language_secondary="english",
                 status="ready",
                 social_caption=(
-                    f"🎉 {CLOTH_DISCOUNT} की महा छूट — {CLOTH_ORG}, {CLOTH_CITY}!\n\n"
-                    "साड़ी, सूट, कुर्ती, जींस — सभी पर बड़ी सेल!\n"
-                    "सीमित समय / Limited Time Offer!\n\n"
-                    "#BuntyClothStore #MegaSale #Discount #HindiSale #Nagpur #Kapde"
+                    f"🎉 {CLOTH_DISCOUNT} తగ్గింపు — {CLOTH_ORG}, {CLOTH_CITY}!\n\n"
+                    "చీరలు, సూట్లు, కుర్తీ, జీన్స్ — అన్నిపై బిగ్ సేల్!\n"
+                    "పరిమిత సమయం / Limited Time Offer!\n\n"
+                    "#BuntyClothStore #MegaSale #Discount #TeluguSale #Nagpur #Vastralu"
                 ),
-                hashtags=["BuntyClothStore", "MegaSale", "Discount", "HindiSale", "Nagpur", "Kapde"],
+                hashtags=["BuntyClothStore", "MegaSale", "Discount", "TeluguSale", "Nagpur", "Vastralu"],
                 poster_json=make_cloth_discount_instagram(CLOTH_ORG, CLOTH_CITY, CLOTH_DISCOUNT),
                 campaign_data={
                     "template_slug": "retail_discount",
                     "org_name": CLOTH_ORG, "city": CLOTH_CITY,
-                    "secondary_language": "hindi",
+                    "secondary_language": "telugu",
                 },
                 created_at=datetime.now(timezone.utc),
             ),
@@ -557,20 +557,20 @@ async def seed():
                 tenant_id=bunty_tenant.id,
                 platform="whatsapp_share",
                 width="1080", height="1080",
-                language_primary="hindi", language_secondary="english",
+                language_primary="telugu", language_secondary="english",
                 status="ready",
                 social_caption=(
-                    f"🛍️ {CLOTH_DISCOUNT} छूट — {CLOTH_ORG}!\n\n"
-                    "सभी कपड़ों पर भारी छूट।\n"
-                    "आज ही Visit करें!\n\n"
-                    "#BuntyClothStore #Nagpur #Sale"
+                    f"🛍️ {CLOTH_DISCOUNT} తగ్గింపు — {CLOTH_ORG}!\n\n"
+                    "అన్ని దుస్తులపై పెద్ద తగ్గింపు.\n"
+                    "ఈరోజే Visit చేయండి!\n\n"
+                    "#BuntyClothStore #Nagpur #TeluguSale #MegaSale"
                 ),
-                hashtags=["BuntyClothStore", "Nagpur", "HindiSale", "MegaSale"],
+                hashtags=["BuntyClothStore", "Nagpur", "TeluguSale", "MegaSale"],
                 poster_json=make_cloth_discount_whatsapp(CLOTH_ORG, CLOTH_CITY, CLOTH_DISCOUNT),
                 campaign_data={
                     "template_slug": "retail_discount",
                     "org_name": CLOTH_ORG, "city": CLOTH_CITY,
-                    "secondary_language": "hindi",
+                    "secondary_language": "telugu",
                 },
                 created_at=datetime.now(timezone.utc),
             ),
@@ -582,19 +582,19 @@ async def seed():
             platform="whatsapp",
             campaign="Bunty Cloth Mega Sale",
             content=(
-                f"🛍️ *{CLOTH_ORG} — महा सेल!*\n\n"
-                f"*{CLOTH_DISCOUNT} की छूट — सभी कपड़ों पर!*\n\n"
-                "🎁 क्या मिलेगा:\n"
-                "✅ साड़ी / Saree\n"
-                "✅ सूट / Suits\n"
-                "✅ कुर्ती / Kurti\n"
-                "✅ जींस / Jeans\n"
-                "✅ बच्चों के कपड़े / Kids Wear\n"
-                "✅ वेडिंग कलेक्शन\n\n"
-                "⏰ *सीमित समय / Limited Time Only!*\n\n"
+                f"🛍️ *{CLOTH_ORG} — మహా సేల్!*\n\n"
+                f"*{CLOTH_DISCOUNT} తగ్౧ింపు — అన్ని దుస్తులపై!*\n\n"
+                "🎁 మనకు ఎటువంటివి ఉన్నాయి:\n"
+                "✅ చీరలు / Saree\n"
+                "✅ సూట్లు / Suits\n"
+                "✅ కుర్తీ / Kurti\n"
+                "✅ జీన్స్ / Jeans\n"
+                "✅ పిల్లల దుస్తులు / Kids Wear\n"
+                "✅ పెళ్ళి కలెక్షన్ / Wedding Collection\n\n"
+                "⏰ *పరిమిత సమయం / Limited Time Only!*\n\n"
                 f"📍 {CLOTH_ORG}, {CLOTH_CITY}\n"
-                "📞 जल्दी Call करें — Stock Limited!\n\n"
-                "*अपने दोस्तों को Share करें! 🙏*"
+                "📞 తొందరగా Call చేయండి — Stock Limited!\n\n"
+                "*మీ మిత్రులకు Share చేయండి! 🙏*"
             ),
             status="published",
             ai_generated=False,
