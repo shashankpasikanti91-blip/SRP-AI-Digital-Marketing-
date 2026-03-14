@@ -14,15 +14,15 @@ class Settings(BaseSettings):
     APP_NAME: str = "AI Marketing OS"
     APP_VERSION: str = "1.0.0"
     APP_ENV: str = "development"  # development | production | testing
-    DEBUG: bool = True
+    DEBUG: bool = False  # override via env: DEBUG=true for local dev
     SECRET_KEY: str = "change-me-in-production-super-secret-key"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
 
     # ── Database ─────────────────────────────────────────────────────────
     DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/ai_marketing_os"
-    DATABASE_POOL_SIZE: int = 10
-    DATABASE_MAX_OVERFLOW: int = 20
+    DATABASE_POOL_SIZE: int = 3    # per-process pool; 1 worker × 3 = 3 total connections
+    DATABASE_MAX_OVERFLOW: int = 5  # burst headroom — was 20 (too many idle connections)
 
     # ── Redis ─────────────────────────────────────────────────────────────
     REDIS_URL: str = "redis://localhost:6379/0"
