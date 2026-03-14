@@ -196,7 +196,8 @@ services:
     mem_limit: 128m
     mem_reservation: 48m
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'celery.*beat' > /dev/null || exit 1"]
+      # pgrep not in python:slim — check PID 1 (the beat process) is alive
+      test: ["CMD-SHELL", "kill -0 1 2>/dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       start_period: 30s
@@ -220,7 +221,8 @@ services:
     mem_limit: 48m
     mem_reservation: 16m
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      # Use 127.0.0.1 to force IPv4 — alpine wget resolves 'localhost' to ::1 first
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
