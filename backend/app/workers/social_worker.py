@@ -4,9 +4,19 @@ import asyncio
 import logging
 from datetime import datetime, timezone
 
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
+
 from app.workers.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
+
+
+def _make_session():
+    """Create a fresh engine+session per Celery task to avoid asyncio event-loop conflicts."""
+    from app.config import settings
+    engine = create_async_engine(settings.DATABASE_URL, poolclass=NullPool)
+    return engine, async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
 @celery_app.task(name="app.workers.social_worker.check_and_publish_posts", bind=True, max_retries=3)
@@ -23,52 +33,59 @@ def publish_post_task(self, post_id: str):
 
 async def _check_and_publish():
     from sqlalchemy import select
-    from app.database import AsyncSessionLocal
     from app.models.social import PostStatus, SocialPost
 
+    engine, session_maker = _make_session()
+
     now = datetime.now(timezone.utc)
-    async with AsyncSessionLocal() as db:
-        result = await db.execute(
-            select(SocialPost).where(
-                SocialPost.status == PostStatus.SCHEDULED,
-                SocialPost.scheduled_at <= now,
+    try:
+        async with session_maker() as db:
+            result = await db.execute(
+                select(SocialPost).where(
+                    SocialPost.status == PostStatus.SCHEDULED,
+                    SocialPost.scheduled_at <= now,
+                )
             )
-        )
-        due_posts = list(result.scalars().all())
-        for post in due_posts:
-            try:
-                await _do_publish(post)
-                post.status = PostStatus.PUBLISHED
-                post.published_at = datetime.now(timezone.utc)
-                logger.info("Published post %s to %s", post.id, post.platform)
-            except Exception as exc:
-                post.retry_count += 1
-                post.error_message = str(exc)
-                if post.retry_count >= 3:
-                    post.status = PostStatus.FAILED
-                logger.error("Failed to publish post %s: %s", post.id, exc)
-        await db.commit()
+            due_posts = list(result.scalars().all())
+            for post in due_posts:
+                try:
+                    await _do_publish(post)
+                    post.status = PostStatus.PUBLISHED
+                    post.published_at = datetime.now(timezone.utc)
+                    logger.info("Published post %s to %s", post.id, post.platform)
+                except Exception as exc:
+                    post.retry_count += 1
+                    post.error_message = str(exc)
+                    if post.retry_count >= 3:
+                        post.status = PostStatus.FAILED
+                    logger.error("Failed to publish post %s: %s", post.id, exc)
+            await db.commit()
+    finally:
+        await engine.dispose()
 
 
 async def _publish_single(post_id: str):
     from sqlalchemy import select
-    from app.database import AsyncSessionLocal
     from app.models.social import PostStatus, SocialPost
 
-    async with AsyncSessionLocal() as db:
-        result = await db.execute(select(SocialPost).where(SocialPost.id == post_id))
-        post = result.scalar_one_or_none()
-        if not post:
-            logger.warning("Post %s not found", post_id)
-            return
-        try:
-            await _do_publish(post)
-            post.status = PostStatus.PUBLISHED
-            post.published_at = datetime.now(timezone.utc)
-        except Exception as exc:
-            post.status = PostStatus.FAILED
-            post.error_message = str(exc)
-        await db.commit()
+    engine, session_maker = _make_session()
+    try:
+        async with session_maker() as db:
+            result = await db.execute(select(SocialPost).where(SocialPost.id == post_id))
+            post = result.scalar_one_or_none()
+            if not post:
+                logger.warning("Post %s not found", post_id)
+                return
+            try:
+                await _do_publish(post)
+                post.status = PostStatus.PUBLISHED
+                post.published_at = datetime.now(timezone.utc)
+            except Exception as exc:
+                post.status = PostStatus.FAILED
+                post.error_message = str(exc)
+            await db.commit()
+    finally:
+        await engine.dispose()
 
 
 async def _do_publish(post) -> None:
