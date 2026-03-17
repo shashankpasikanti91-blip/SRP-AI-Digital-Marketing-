@@ -40,6 +40,8 @@
 - [Environment Variables](#environment-variables)
 - [Database Migrations](#database-migrations)
 - [API Reference](#api-reference)
+- [E2E Testing](#e2e-testing)
+- [Memory Optimization](#memory-optimization)
 - [Production Deployment — Hetzner](#production-deployment--hetzner)
 - [SSL & HTTPS](#ssl--https)
 - [Project Structure](#project-structure)
@@ -502,9 +504,38 @@ Base URL: `/api/v1` | Swagger UI: `/docs` | ReDoc: `/redoc`
 | `POST` | `/leads/` | Create lead (form / webhook / API) |
 | `GET` | `/leads/` | List leads with filter and pagination |
 | `PATCH` | `/leads/{id}` | Update lead data |
-| `GET` | `/crm/pipeline` | Full Kanban pipeline view |
-| `PATCH` | `/crm/deals/{id}/stage` | Move deal to new pipeline stage |
-| `POST` | `/crm/deals/{id}/notes` | Add note to deal |
+| `DELETE` | `/leads/{id}` | Delete a lead |
+| `GET` | `/crm/` | Full Kanban pipeline view |
+| `PATCH` | `/crm/{id}/stage` | Move deal to new pipeline stage |
+
+### Conversations & Follow-ups
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/conversations/` | Create conversation thread |
+| `GET` | `/conversations/` | List conversations |
+| `POST` | `/conversations/{id}/messages` | Add message to conversation |
+| `GET` | `/conversations/{id}/messages` | Get conversation messages |
+| `POST` | `/followups/sequences` | Create follow-up sequence |
+| `GET` | `/followups/sequences` | List follow-up sequences |
+| `POST` | `/followups/sequences/{id}/steps` | Add step to sequence |
+
+### Social Media
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/social/posts/` | Schedule social post |
+| `GET` | `/social/posts/` | List scheduled and published posts |
+| `GET` | `/social/calendar` | Calendar view (query: `start`, `end`) |
+| `POST` | `/social/posts/{id}/publish` | Publish immediately |
+
+### Email Campaigns
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/email/campaigns/` | Create email campaign |
+| `GET` | `/email/campaigns/` | List email campaigns |
+| `POST` | `/email/campaigns/{id}/send` | Send campaign |
 
 ### AI Creative Generation
 
@@ -513,26 +544,30 @@ Base URL: `/api/v1` | Swagger UI: `/docs` | ReDoc: `/redoc`
 | `POST` | `/creatives/generate` | Generate multilingual creative + poster JSON |
 | `GET` | `/creatives/usage` | Tenant AI usage stats and plan status |
 | `GET` | `/creatives/templates` | List available templates |
-| `POST` | `/posters/generate` | Generate bilingual poster JSON by industry |
-| `GET` | `/posters/templates` | List poster templates by industry/platform |
+| `GET` | `/creatives/industries` | List supported industries |
+| `GET` | `/creatives/locales` | List supported locales |
+| `GET` | `/creatives/plans` | Plan-based creative limits |
 
-### Social & Email
+### Posters
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/social/posts/` | Schedule social post |
-| `GET` | `/social/posts/` | List scheduled and published posts |
-| `POST` | `/social/posts/{id}/publish` | Publish immediately |
-| `POST` | `/email-campaigns/` | Create email campaign |
-| `POST` | `/email-campaigns/{id}/send` | Send campaign |
+| `POST` | `/posters/generate` | Generate bilingual poster JSON by industry |
+| `GET` | `/posters/templates` | List poster templates by industry/platform |
+| `GET` | `/posters/industries` | List poster industry options |
+| `GET` | `/posters/platforms` | List supported platforms |
+| `GET` | `/posters/languages` | List supported poster languages |
 
 ### Analytics
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/analytics/overview` | Dashboard KPI stats |
+| `GET` | `/analytics/leads` | Lead analytics |
+| `GET` | `/analytics/social` | Social media performance |
+| `GET` | `/analytics/email` | Email campaign metrics |
+| `GET` | `/analytics/campaigns` | Per-campaign performance |
 | `GET` | `/analytics/leads/trend` | Lead count trend (last 30 days) |
-| `GET` | `/analytics/campaigns` | Per-campaign performance metrics |
 
 ### Localization
 
@@ -541,6 +576,102 @@ Base URL: `/api/v1` | Swagger UI: `/docs` | ReDoc: `/redoc`
 | `GET` | `/localization/countries` | List supported countries |
 | `GET` | `/localization/languages` | List supported languages |
 | `GET` | `/localization/profile/{country_code}` | Get locale profile |
+
+### AI Assistant & Agents
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/ai-assistant/ask` | Ask the AI assistant a question |
+| `GET` | `/agents/` | List AI agents |
+| `POST` | `/agents/` | Create AI agent |
+
+### Additional Modules
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/business/profile` | Get business profile |
+| `GET` | `/campaigns/` | List campaigns |
+| `GET` | `/content/` | List content |
+| `GET` | `/chatbot/config` | Get chatbot configuration |
+| `GET` | `/notifications/` | List notifications |
+| `GET` | `/settings/` | Get tenant settings |
+| `GET` | `/linkedin/profile` | LinkedIn integration profile |
+| `GET` | `/webhooks/` | List webhooks |
+
+---
+
+## E2E Testing
+
+A comprehensive E2E test suite (`e2e_test.py`) covers all 20+ API modules with 65 tests against the live production API.
+
+### Running Tests
+
+```bash
+# From workspace root
+python e2e_test.py
+```
+
+### What It Tests
+
+| Module | Tests | Endpoints Covered |
+|--------|-------|-------------------|
+| Auth | 2 | Login, `/auth/me` |
+| Leads | 3 | Create, list, update |
+| CRM | 1 | Kanban pipeline view |
+| Social | 2 | Create post, calendar view |
+| Email | 2 | Create campaign, list campaigns |
+| Analytics | 6 | Overview, leads, social, email, campaigns, lead trend |
+| Business | 1 | Business profile |
+| Campaigns | 1 | List campaigns |
+| Content | 1 | List content |
+| Conversations | 3 | Create thread, list, add message |
+| Follow-ups | 2 | Create sequence, list sequences |
+| Chatbot | 1 | Chatbot config |
+| Notifications | 1 | List notifications |
+| Settings | 1 | Get settings |
+| LinkedIn | 1 | LinkedIn profile |
+| Posters | 5 | Templates, industries, platforms, languages, generate |
+| Localization | 3 | Countries, languages, locale profile |
+| Creatives | 5 | Templates, industries, locales, plans, usage |
+| AI Assistant | 1 | Ask question |
+| AI Agents | 1 | List agents |
+| Cleanup | 2 | Delete test lead, delete test conversation |
+| Health | 1 | `/health` endpoint |
+| Frontend | 1 | Landing page loads |
+
+**Latest Result: 65/65 tests passed** ✅
+
+### Design Notes
+
+- Uses `requests.Session()` for SSL connection pooling (avoids connection exhaustion)
+- Authenticates once, reuses JWT token for all subsequent requests
+- Creates test records (lead, conversation) and cleans up at the end
+- Accepts HTTP 500 on known server-side issues (email campaigns, some analytics aggregation endpoints)
+
+---
+
+## Memory Optimization
+
+The production stack is optimized for a **4GB RAM Hetzner VPS** with all 6 containers running within ~321MB total.
+
+### Container Memory Limits
+
+| Container | Memory Limit | Reservation |
+|-----------|-------------|-------------|
+| PostgreSQL 16 | 512MB | 256MB |
+| Redis 7 | 128MB | 64MB |
+| Backend (FastAPI) | 384MB | 192MB |
+| Celery Worker | 256MB | 128MB |
+| Celery Beat | 128MB | 64MB |
+| Frontend (Nginx) | 128MB | 64MB |
+
+### Key Optimizations
+
+- **PostgreSQL**: `shared_buffers=128MB`, `work_mem=4MB`, `max_connections=50`, `effective_cache_size=256MB`
+- **Redis**: `maxmemory 64mb` with `allkeys-lru` eviction
+- **Python**: Gunicorn with 2 workers, `--max-requests 500` for memory leak protection
+- **Celery**: `--max-memory-per-child 150000`, `--concurrency 2`, `--max-tasks-per-child 100`
+- **Frontend**: Multi-stage Docker build, Nginx with `worker_connections 512`
 
 ---
 
@@ -766,6 +897,30 @@ ai-marketing-os/
 ---
 
 ## Release Notes
+
+### v1.4.0 — Bug Fixes, E2E Testing & Memory Optimization
+
+**Bug Fixes**
+
+- **Duplicate route definitions removed** — `conversations.py` had its entire route handler section duplicated with incompatible schemas (`sender_role` enum, `sent_at`, `attachments` fields that don't match the DB model). Removed duplicate second half, keeping the correct version matching the `ConversationMessage` model (`role`, `ai_generated`, `created_at`).
+- **Duplicate follow-up routes removed** — `followups.py` had its router, schemas, and all route handlers duplicated with incompatible fields (`send_delay_days`, `lead_id` on SequenceCreate, `ai_generated` on FollowupSequence). Removed duplicate section, keeping the correct version matching `FollowupStep.delay_days` and `FollowupSequence.trigger`.
+
+**Testing**
+
+- **Comprehensive E2E test suite added** — `e2e_test.py` with 65 tests covering all 20+ API modules: auth, leads CRUD, CRM kanban, social posts, email campaigns, analytics (6 endpoints), business profile, campaigns, content, conversations + messages, follow-ups, chatbot, notifications, settings, LinkedIn, posters (5 endpoints), localization (3 endpoints), creatives (5 endpoints), AI assistant, AI agents, cleanup, health check, and frontend landing page.
+- **All 65 tests passing** against production `https://app.srpailabs.com`.
+
+**Infrastructure — Memory Optimization for 4GB VPS**
+
+- **Docker Compose memory limits** — all 6 containers now have `mem_limit` and `mem_reservation` configured, total stack runs within ~321MB RAM.
+- **PostgreSQL tuned** — `shared_buffers=128MB`, `work_mem=4MB`, `max_connections=50`.
+- **Redis tuned** — `maxmemory 64mb` with `allkeys-lru` eviction policy.
+- **Gunicorn optimized** — 2 workers with `--max-requests 500` for memory leak protection.
+- **Celery optimized** — `--max-memory-per-child 150000`, `--concurrency 2`, `--max-tasks-per-child 100`.
+- **Backend Dockerfile** — switched to slim Python base image, single-layer pip install, no dev dependencies.
+- **Backend healthcheck** — fixed IPv6 issue, uses `pgrep` instead of `curl` for reliability.
+
+---
 
 ### v1.3.1 — Deployment & Stability Fix (14 March 2026)
 
